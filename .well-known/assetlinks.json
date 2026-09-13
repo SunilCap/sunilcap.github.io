@@ -1,0 +1,16 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.blackjackcasinotables.scotcha",
+      "sha256_cert_fingerprints": [
+        "BC:3E:83:B3:49:58:D1:44:66:AC:4E:2A:54:D5:29:8E:F5:F0:70:44:A3:8E:80:76:2B:54:C4:3A:27:9D:D8:6D",
+        "99:F4:61:86:E9:C8:31:B4:B9:5E:9F:B2:4B:A8:2F:91:A7:2D:68:F8:31:C0:48:59:0B:09:E5:8F:0A:EF:D2:37",
+        "A1:DA:4A:45:A7:D8:D2:8B:7E:15:65:1D:6B:38:F3:BE:F9:48:AA:E1:8D:15:4C:9B:CA:3B:97:6B:F3:07:37:3B"
+      ]
+    }
+  }
+]
