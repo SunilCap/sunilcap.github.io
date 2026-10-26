@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#070b1c">
 <meta name="description" content="Rocket Dash — a one-tap HTML5 arcade game. Dodge gates, collect stars, and beat your best distance.">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2129877342025466" crossorigin="anonymous"></script>
+<script>
+  // Google H5 Games Ads / Ad Placement API bootstrap.
+  window.adsbygoogle = window.adsbygoogle || [];
+  window.adBreak = window.adConfig = function(o) { window.adsbygoogle.push(o); };
+</script>
 <title>Rocket Dash — One-Tap Arcade</title>
 <style>
 :root{color-scheme:dark;--cyan:#59e7ff;--violet:#9b78ff;--ink:#070b1c;--panel:rgba(13,22,48,.78)}
@@ -102,6 +108,7 @@ const $=id=>document.getElementById(id);
 let W=0,H=0,DPR=1, state='ready', last=0, time=0, score=0, stars=0, best=0;
 let rocket={x:0,y:0,vy:0,tilt:0}, gates=[], particles=[], starItems=[], bgStars=[];
 let speed=245, spawnTimer=0, soundOn=true, audioCtx=null, shake=0, flash=0, newBest=false;
+let adInProgress=false, runsSinceAd=0, hasStartedOnce=false;
 try{best=Number(localStorage.getItem('rocketDashBest')||0)||0}catch(e){}
 $('best').textContent=String(best).padStart(3,'0');
 function resize(){
@@ -232,14 +239,66 @@ function draw(){
 function frame(now){const dt=Math.min(.035,(now-last)/1000||0);last=now;if(state==='playing')update(dt);else if(state==='over'){for(const p of particles){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=120*dt;p.life-=dt}particles=particles.filter(p=>p.life>0);shake=Math.max(0,shake-dt*20);flash=Math.max(0,flash-dt)}draw();requestAnimationFrame(frame)}
 function togglePause(){if(state==='playing'){state='paused';$('pauseOverlay').classList.remove('hidden');$('pauseBtn').textContent='▶'}else if(state==='paused'){state='playing';$('pauseOverlay').classList.add('hidden');$('pauseBtn').textContent='Ⅱ';last=performance.now()}}
 function action(){if(state==='playing')boost();else if(state==='ready')start();else if(state==='over'){start()}else if(state==='paused')togglePause()}
-$('startBtn').addEventListener('click',start);$('restartBtn').addEventListener('click',start);
+$('startBtn').addEventListener('click',launchWithAd);$('restartBtn').addEventListener('click',restartWithAd);
 $('homeBtn').addEventListener('click',()=>{state='ready';$('overOverlay').classList.add('hidden');$('startOverlay').classList.remove('hidden');rocket={x:W*.25,y:H*.48,vy:0,tilt:0};gates=[];starItems=[]});
 $('pauseBtn').addEventListener('click',()=>{if(state==='playing'||state==='paused')togglePause()});
 $('resumeBtn').addEventListener('click',togglePause);$('quitBtn').addEventListener('click',()=>{state='over';$('pauseOverlay').classList.add('hidden');$('overOverlay').classList.remove('hidden');$('finalScore').textContent=Math.floor(score);$('resultLine').textContent='Run ended early · '+stars+' stars collected'});
-$('soundBtn').addEventListener('click',()=>{soundOn=!soundOn;$('soundBtn').textContent=soundOn?'♫':'♪';$('soundBtn').style.opacity=soundOn?'1':'.55';if(soundOn)sound(600,.05)});
+$('soundBtn').addEventListener('click',()=>{soundOn=!soundOn;$('soundBtn').textContent=soundOn?'♫':'♪';$('soundBtn').style.opacity=soundOn?'1':'.55';try { if (typeof window.adConfig === 'function') window.adConfig({sound: soundOn ? 'on' : 'off'}); } catch(e) {}
+if(soundOn)sound(600,.05)});
 shell.addEventListener('pointerdown',e=>{if(e.target.closest('button')||e.target.closest('.card'))return;if(state==='playing'){e.preventDefault();boost()}},{passive:false});
 window.addEventListener('keydown',e=>{if(['Space','ArrowUp','KeyW'].includes(e.code)){e.preventDefault();if(!e.repeat)action()}else if(e.code==='Escape'){if(state==='playing'||state==='paused')togglePause()}else if(e.code==='KeyR'&&state==='over')start()});
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&state==='playing')togglePause()});
+// Configure the H5 Games Ad Placement API. This is an ad opportunity, not a guarantee of fill.
+try {
+  if (typeof window.adConfig === 'function') {
+    window.adConfig({preloadAdBreaks:'auto', sound:soundOn?'on':'off'});
+  }
+} catch (err) { console.warn('H5 Games Ads initialization issue:', err); }
+
+function requestGameAd(type, done) {
+  if (adInProgress || typeof window.adBreak !== 'function') { done(); return; }
+  adInProgress = true;
+  let completed = false;
+  const finish = () => {
+    if (completed) return;
+    completed = true;
+    adInProgress = false;
+    done();
+  };
+  try {
+    window.adBreak({
+      type: type,
+      name: type === 'start' ? 'rocket_dash_start' : 'rocket_dash_next_run',
+      beforeAd: () => {
+        if (audioCtx && audioCtx.state === 'running') audioCtx.suspend().catch(() => {});
+      },
+      afterAd: () => {
+        if (audioCtx && audioCtx.state === 'suspended' && soundOn) audioCtx.resume().catch(() => {});
+      },
+      adBreakDone: () => finish()
+    });
+  } catch (err) {
+    console.warn('H5 Games ad placement failed:', err);
+    finish();
+  }
+}
+function launchWithAd() {
+  if (!hasStartedOnce) {
+    hasStartedOnce = true;
+    requestGameAd('start', start);
+  } else {
+    start();
+  }
+}
+function restartWithAd() {
+  runsSinceAd++;
+  if (runsSinceAd >= 3) {
+    runsSinceAd = 0;
+    requestGameAd('next', start);
+  } else {
+    start();
+  }
+}
 reset();requestAnimationFrame(frame);
 })();
 </script>
