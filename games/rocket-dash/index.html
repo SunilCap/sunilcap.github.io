@@ -36,6 +36,7 @@ h1{font-size:clamp(36px,9vw,58px);line-height:.95;letter-spacing:-.055em;margin:
 .secondary{margin-top:10px;width:100%;border:2px solid #dce8ec;border-radius:13px;padding:12px;background:#f4fafb;color:#426078;font-size:11px;font-weight:900;letter-spacing:.08em;cursor:pointer}
 .controls{display:flex;gap:8px;justify-content:center;margin-top:17px;color:#678296;font-size:10px;letter-spacing:.03em}
 .key{display:inline-grid;place-items:center;min-width:24px;height:22px;padding:0 6px;border:1px solid #d3e1e7;border-radius:7px;color:#426078;background:#f0f7fa;font-weight:900;margin-right:4px}
+.is-playing .brand,.is-playing .hint,.is-playing #backHomeBtn{display:none!important}
 .hidden{display:none!important}
 .gameover-score{font-size:44px;font-weight:900;letter-spacing:-.04em;margin:5px 0}.bestline{font-size:11px;color:#9bb0d7;margin-bottom:18px}
 #toast{position:absolute;z-index:4;top:24%;left:50%;transform:translate(-50%,-8px);opacity:0;color:#baf8ff;font-size:12px;font-weight:900;letter-spacing:.16em;text-shadow:0 0 15px #4ae5ff;transition:opacity .18s,transform .18s;pointer-events:none}
@@ -46,7 +47,8 @@ h1{font-size:clamp(36px,9vw,58px);line-height:.95;letter-spacing:-.055em;margin:
 .reward-note{font-size:10px;color:#6d8797;line-height:1.4;margin:7px 0 0;min-height:24px}
 .reward-btn{margin-top:8px;width:100%;border:2px solid #8dcf88;border-radius:13px;padding:11px;background:#efffed;color:#286c42;font-size:11px;font-weight:950;letter-spacing:.02em;cursor:pointer}
 .reward-btn:disabled{opacity:.55;cursor:wait}
-.primary.hidden{display:none!important}
+.primary.is-playing .brand,.is-playing .hint,.is-playing #backHomeBtn{display:none!important}
+.hidden{display:none!important}
 #overOverlay .card{max-height:92%;overflow-y:auto}
 </style>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2129877342025466" crossorigin="anonymous"></script>
@@ -89,6 +91,7 @@ h1{font-size:clamp(36px,9vw,58px);line-height:.95;letter-spacing:-.055em;margin:
     <h1>ROCKET<br><span style="color:#ff8b5c">DASH</span></h1>
     <p class="subtitle">Zip past silly orange gates, grab shiny stars, and see how far your rocket can fly!</p>
     <button class="primary" id="startBtn">Launch mission&nbsp; ↗</button>
+    <a class="secondary" href="/" style="display:block;text-decoration:none" aria-label="Back to Scotcha home">⌂ BACK TO HOME</a>
     <div class="controls"><span><i class="key">TAP</i> THRUST</span><span><i class="key">SPACE</i> DESKTOP</span></div>
   </div>
 </div>
@@ -104,6 +107,7 @@ h1{font-size:clamp(36px,9vw,58px);line-height:.95;letter-spacing:-.055em;margin:
     <div class="reward-note" id="rewardNote">Collect stars during flight. Spend 25 stars to continue once per run, or watch a rewarded ad for 10 stars.</div>
     <button class="primary" id="restartBtn">Fly again&nbsp; ↻</button>
     <button class="secondary" id="homeBtn">MAIN MENU</button>
+    <a class="secondary" href="/" style="display:block;text-decoration:none" aria-label="Back to Scotcha home">⌂ BACK TO HOME</a>
   </div>
 </div>
 <div class="overlay hidden" id="pauseOverlay">
@@ -150,7 +154,7 @@ function reset(){
  for(let i=0;i<3;i++)spawnGate(W+i*W*.57+120);
  updateHUD();
 }
-function start(){reset();state='playing';$('startOverlay').classList.add('hidden');$('overOverlay').classList.add('hidden');$('pauseOverlay').classList.add('hidden');$('hint').innerHTML='<b>TAP / CLICK</b> to thrust upward<br><span>Watch the gap. The opening gets smaller every 20 seconds. Flight speed stays steady.</span>';boost();last=performance.now()}
+function start(){reset();state='playing';shell.classList.add('is-playing');$('startOverlay').classList.add('hidden');$('overOverlay').classList.add('hidden');$('pauseOverlay').classList.add('hidden');$('hint').innerHTML='<b>TAP / CLICK</b> to thrust upward<br><span>Watch the gap. The opening gets smaller every 20 seconds. Flight speed stays steady.</span>';boost();last=performance.now()}
 function boost(){if(state!=='playing')return;rocket.vy=-H*.58;sound(520,.055,'triangle',.026);for(let i=0;i<5;i++)particles.push({x:rocket.x-13,y:rocket.y+10,vx:rand(-110,-30),vy:rand(20,95),life:rand(.18,.42),max:.42,size:rand(2,5),color:Math.random()>.4?'#64eaff':'#ffb45d'})}
 function spawnGate(x=W+60){
  // Difficulty progression changes ONLY the vertical opening. Flight speed and gate cadence stay steady.
@@ -187,7 +191,7 @@ function update(dt){
 function updateHUD(){$('score').textContent=String(Math.floor(score)).padStart(3,'0');$('stars').textContent=stars;$('best').textContent=String(Math.max(best,Math.floor(score))).padStart(3,'0');$('walletLine').textContent=`⭐ Star bank: ${starBank}`}
 function burst(x,y,color,n){for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,v=rand(40,220);particles.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:rand(.25,.65),max:.65,size:rand(2,5),color})}}
 function crash(){
- if(state!=='playing')return;state='over';shake=13;flash=.4;sound(130,.22,'sawtooth',.045);burst(rocket.x,rocket.y,'#ff7b92',28);
+ if(state!=='playing')return;state='over';shell.classList.remove('is-playing');shake=13;flash=.4;sound(130,.22,'sawtooth',.045);burst(rocket.x,rocket.y,'#ff7b92',28);
  const final=Math.floor(score);newBest=final>best;if(newBest){best=final;try{localStorage.setItem('rocketDashBest',String(best))}catch(e){}}
  $('finalScore').textContent=final;$('resultLine').textContent=(newBest?'✦ NEW PERSONAL BEST  ·  ':'')+` ${stars} star${stars===1?'':'s'} collected`; $('resultEyebrow').textContent=newBest?'New record achieved':'Mission ended';updateHUD();$('continueBtn').classList.toggle('hidden',continueUsed||starBank<25);$('watchAdBtn').disabled=false;$('rewardNote').textContent=continueUsed?'Continue already used this run. Start a new run to play again.':'Spend 25 banked stars to continue, or watch a rewarded ad to earn 10 more.';
  setTimeout(()=>{if(state==='over')$('overOverlay').classList.remove('hidden')},420);
@@ -285,7 +289,7 @@ function continueFlight(){
  if(state!=='over'||continueUsed||starBank<25)return;
  starBank-=25;continueUsed=true;continueInvulnerable=2.2;
  try{localStorage.setItem('rocketDashStarBank',String(starBank))}catch(e){}
- $('overOverlay').classList.add('hidden');state='playing';
+ $('overOverlay').classList.add('hidden');shell.classList.add('is-playing');state='playing';
  // Clear nearby gates so the continue cannot cause an unavoidable collision.
  gates=gates.filter(g=>g.x>rocket.x+W*.28);starItems=starItems.filter(s=>s.x>rocket.x+W*.2);
  rocket.y=H*.5;rocket.vy=0;rocket.tilt=0;boost();
@@ -310,9 +314,9 @@ function watchRewardAd(){
 }
 $('continueBtn').addEventListener('click',continueFlight);$('watchAdBtn').addEventListener('click',watchRewardAd);
 $('startBtn').addEventListener('click',start);$('restartBtn').addEventListener('click',start);
-$('homeBtn').addEventListener('click',()=>{state='ready';$('overOverlay').classList.add('hidden');$('startOverlay').classList.remove('hidden');rocket={x:W*.25,y:H*.48,vy:0,tilt:0};gates=[];starItems=[]});
+$('homeBtn').addEventListener('click',()=>{state='ready';shell.classList.remove('is-playing');$('overOverlay').classList.add('hidden');$('startOverlay').classList.remove('hidden');rocket={x:W*.25,y:H*.48,vy:0,tilt:0};gates=[];starItems=[]});
 $('pauseBtn').addEventListener('click',()=>{if(state==='playing'||state==='paused')togglePause()});
-$('resumeBtn').addEventListener('click',togglePause);$('quitBtn').addEventListener('click',()=>{state='over';$('pauseOverlay').classList.add('hidden');$('overOverlay').classList.remove('hidden');$('finalScore').textContent=Math.floor(score);$('resultLine').textContent='Run ended early · '+stars+' stars collected'});
+$('resumeBtn').addEventListener('click',togglePause);$('quitBtn').addEventListener('click',()=>{state='over';shell.classList.remove('is-playing');$('pauseOverlay').classList.add('hidden');$('overOverlay').classList.remove('hidden');$('finalScore').textContent=Math.floor(score);$('resultLine').textContent='Run ended early · '+stars+' stars collected'});
 $('soundBtn').addEventListener('click',()=>{soundOn=!soundOn;$('soundBtn').textContent=soundOn?'♫':'♪';$('soundBtn').style.opacity=soundOn?'1':'.55';if(soundOn)sound(600,.05)});
 shell.addEventListener('pointerdown',e=>{if(e.target.closest('button')||e.target.closest('.card'))return;if(state==='playing'){e.preventDefault();boost()}},{passive:false});
 window.addEventListener('keydown',e=>{if(['Space','ArrowUp','KeyW'].includes(e.code)){e.preventDefault();if(!e.repeat)action()}else if(e.code==='Escape'){if(state==='playing'||state==='paused')togglePause()}else if(e.code==='KeyR'&&state==='over')start()});
