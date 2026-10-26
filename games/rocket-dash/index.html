@@ -67,7 +67,7 @@ h1{font-size:clamp(36px,9vw,58px);line-height:.95;letter-spacing:-.055em;margin:
 <div class="overlay" id="startOverlay">
   <div class="card">
     <div class="shipmark"><span>🚀</span></div>
-    <div class="eyebrow">A happy little arcade adventure</div>
+    <div class="eyebrow">An easy, happy little arcade adventure</div>
     <h1>ROCKET<br><span style="color:#ff8b5c">DASH</span></h1>
     <p class="subtitle">Zip past silly orange gates, grab shiny stars, and see how far your rocket can fly!</p>
     <button class="primary" id="startBtn">Launch mission&nbsp; ↗</button>
@@ -121,27 +121,41 @@ function sound(freq=440,dur=.07,type='sine',vol=.035){
  o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+dur)}catch(e){}
 }
 function reset(){
- score=0;stars=0;time=0;speed=Math.max(225,W*.36);spawnTimer=.9;gates=[];particles=[];starItems=[];shake=0;flash=0;newBest=false;
- rocket={x:W*.25,y:H*.48,vy:0,tilt:0};
- for(let i=0;i<3;i++)spawnGate(W+i*W*.57+120);
+ score=0;stars=0;time=0;
+ // Easy, viewport-scaled tuning: consistent play feel on portrait and desktop layouts.
+ speed=W*.27;spawnTimer=1.65;gates=[];particles=[];starItems=[];shake=0;flash=0;newBest=false;
+ rocket={x:W*.24,y:H*.50,vy:0,tilt:0};
+ lastGateCenter=H*.50;
+ for(let i=0;i<3;i++)spawnGate(W+i*W*.64+100);
  updateHUD();
 }
-function start(){reset();state='playing';$('startOverlay').classList.add('hidden');$('overOverlay').classList.add('hidden');$('pauseOverlay').classList.add('hidden');$('hint').innerHTML='<b>TAP / CLICK</b> to thrust upward<br><span>Watch the gap. Flight speed increases over time.</span>';boost();last=performance.now()}
-function boost(){if(state!=='playing')return;rocket.vy=-H*.58;sound(520,.055,'triangle',.026);for(let i=0;i<5;i++)particles.push({x:rocket.x-13,y:rocket.y+10,vx:rand(-110,-30),vy:rand(20,95),life:rand(.18,.42),max:.42,size:rand(2,5),color:Math.random()>.4?'#64eaff':'#ffb45d'})}
+function start(){reset();state='playing';$('startOverlay').classList.add('hidden');$('overOverlay').classList.add('hidden');$('pauseOverlay').classList.add('hidden');$('hint').innerHTML='<b>TAP / CLICK</b> to gently boost<br><span>Wide gaps and steady speed — take your time!</span>';boost();last=performance.now()}
+function boost(){if(state!=='playing')return;rocket.vy=-H*.40;sound(520,.055,'triangle',.026);for(let i=0;i<4;i++)particles.push({x:rocket.x-13,y:rocket.y+10,vx:rand(-75,-20),vy:rand(12,55),life:rand(.18,.36),max:.36,size:rand(2,4),color:Math.random()>.4?'#64eaff':'#ffb45d'})}
+let lastGateCenter=0;
 function spawnGate(x=W+60){
- const gap=Math.max(142,Math.min(210,H*.25)-Math.max(0,time-12)*1.1);
- const margin=Math.max(75,H*.13),center=rand(margin+gap/2,H-margin-gap/2);
- const width=Math.max(48,Math.min(68,W*.13));
+ // A wide opening that scales with screen height. Centers move gradually, never jumping
+ // from the top to the bottom between adjacent obstacles.
+ const gap=Math.max(180,H*.40);
+ const half=gap/2;
+ const margin=Math.max(28,H*.075);
+ const minCenter=margin+half, maxCenter=H-margin-half;
+ const maxStep=H*.075;
+ const previous=lastGateCenter || H*.5;
+ const center=Math.max(minCenter,Math.min(maxCenter,previous+rand(-maxStep,maxStep)));
+ lastGateCenter=center;
+ const width=Math.max(34,Math.min(54,W*.085));
  gates.push({x,center,gap,width,passed:false,seed:Math.random()*10});
- if(Math.random()<.88)starItems.push({x:x+width+rand(45,90),y:center+rand(-gap*.2,gap*.2),r:10,got:false,phase:Math.random()*6});
+ // Stars are optional bonus rewards placed near the middle of the safe opening.
+ if(Math.random()<.68)starItems.push({x:x+width+rand(55,90),y:center+rand(-gap*.12,gap*.12),r:10,got:false,phase:Math.random()*6});
 }
 function update(dt){
- time+=dt;speed=Math.min(W*.72, W*.36+time*2.6);rocket.vy+=H*1.18*dt;rocket.y+=rocket.vy*dt;rocket.tilt=Math.max(-.45,Math.min(.9,rocket.vy/(H*.9)));
- spawnTimer-=dt;if(spawnTimer<=0){spawnGate(W+80);spawnTimer=Math.max(.82,1.36-time*.008)}
+ time+=dt;speed=W*(.27+Math.min(.055,time*.0015));rocket.vy+=H*.82*dt;rocket.y+=rocket.vy*dt;rocket.tilt=Math.max(-.32,Math.min(.55,rocket.vy/(H*.95)));
+ spawnTimer-=dt;if(spawnTimer<=0){spawnGate(W+80);spawnTimer=1.65}
  for(const g of gates){g.x-=speed*dt;
   if(!g.passed&&g.x+g.width<rocket.x){g.passed=true;score+=10;burst(rocket.x,rocket.y,'#5ceaff',9);sound(720,.05,'sine',.018)}
-  if(rocket.x+13>g.x&&rocket.x-13<g.x+g.width){
-   if(rocket.y-12<g.center-g.gap/2||rocket.y+12>g.center+g.gap/2){crash();return}
+  if(rocket.x+10>g.x&&rocket.x-10<g.x+g.width){
+   // Forgiving hitbox: only the rocket's core must fit through the wide opening.
+   if(rocket.y-8<g.center-g.gap/2||rocket.y+8>g.center+g.gap/2){crash();return}
   }
  }
  gates=gates.filter(g=>g.x+g.width>-20);
@@ -153,7 +167,7 @@ function update(dt){
  for(const p of particles){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=Math.pow(.1,dt);p.vy+=45*dt;p.life-=dt}
  particles=particles.filter(p=>p.life>0);
  for(const s of bgStars){s.x-=speed*dt*s.z*.12;if(s.x<0){s.x=W+2;s.y=Math.random()*H}}
- if(rocket.y>H-48||rocket.y<42){crash();return}
+ if(rocket.y>H-28||rocket.y<24){crash();return}
  updateHUD();
 }
 function updateHUD(){$('score').textContent=String(Math.floor(score)).padStart(3,'0');$('stars').textContent=stars;$('best').textContent=String(Math.max(best,Math.floor(score))).padStart(3,'0')}
