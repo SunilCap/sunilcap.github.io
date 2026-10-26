@@ -5,55 +5,58 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#070b1c">
 <meta name="description" content="Rocket Dash — a one-tap HTML5 arcade game. Dodge gates, collect stars, and beat your best distance.">
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2129877342025466" crossorigin="anonymous"></script>
-<script>
-  // Google Ad Placement API bootstrap, following Google's documented H5 Games setup.
-  window.adsbygoogle = window.adsbygoogle || [];
-  const adBreak = window.adBreak = window.adConfig = function(o) { window.adsbygoogle.push(o); };
-</script>
 <title>Rocket Dash — One-Tap Arcade</title>
 <style>
-:root{color-scheme:dark;--cyan:#59e7ff;--violet:#9b78ff;--ink:#070b1c;--panel:rgba(13,22,48,.78)}
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#f5f8ff;touch-action:manipulation}
-body{display:grid;place-items:center;background:radial-gradient(ellipse at 50% 10%,#1a2860 0%,#0b1230 38%,#050816 78%)}
-#shell{position:relative;width:min(100vw,56.25vh);height:min(100dvh,177.78vw);max-width:620px;max-height:1100px;overflow:hidden;background:#071027;isolation:isolate}
+:root{color-scheme:light;--cyan:#ffcf4a;--violet:#8b7cff;--ink:#8bd8f5;--panel:rgba(255,255,255,.92)}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#8bd8f5;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#26344a;touch-action:manipulation}
+body{display:grid;place-items:center;background:#dff7ff}
+#shell{position:relative;width:min(100vw,56.25vh);height:min(100dvh,177.78vw);max-width:620px;max-height:1100px;overflow:hidden;background:#9be3ff;isolation:isolate}
 @media (min-aspect-ratio: 1/1){#shell{width:min(100vw,1100px);height:min(100dvh,66vw);max-width:1100px;max-height:720px}}
 canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 .hud{position:absolute;z-index:2;inset:0;pointer-events:none;padding:clamp(14px,3vw,25px);display:flex;flex-direction:column}
 .top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
-.brand{font-size:clamp(10px,2vw,13px);letter-spacing:.22em;color:#8ba5d7;font-weight:800}.brand b{display:block;color:#fff;font-size:clamp(19px,4vw,28px);letter-spacing:.06em;margin-top:3px}
-.pill{border:1px solid #34456c;background:rgba(7,14,36,.65);border-radius:14px;padding:8px 12px;backdrop-filter:blur(10px);min-width:84px;text-align:right}
-.pill small{display:block;font-size:9px;letter-spacing:.18em;color:#9bb0d7;font-weight:800}.pill strong{display:block;font-size:clamp(18px,4vw,26px);line-height:1.2;font-variant-numeric:tabular-nums}
+.brand{font-size:clamp(10px,2vw,13px);letter-spacing:.16em;color:#365e7b;font-weight:900}.brand b{display:block;color:#243a56;font-size:clamp(19px,4vw,28px);letter-spacing:.02em;margin-top:3px}
+.pill{border:2px solid #fff;background:rgba(255,255,255,.86);border-radius:16px;padding:8px 12px;min-width:84px;text-align:right;box-shadow:0 3px 0 rgba(48,94,122,.12)}
+.pill small{display:block;font-size:9px;letter-spacing:.12em;color:#54728a;font-weight:900}.pill strong{display:block;font-size:clamp(18px,4vw,26px);line-height:1.2;font-variant-numeric:tabular-nums}
 .stats{display:flex;gap:8px;justify-content:center;margin-top:clamp(18px,5vh,44px)}
-.stat{min-width:100px;text-align:center;padding:8px 16px;background:rgba(9,19,45,.48);border:1px solid rgba(99,132,191,.22);border-radius:13px;backdrop-filter:blur(8px)}
-.stat small{display:block;color:#91a9d2;font-size:9px;font-weight:800;letter-spacing:.17em}.stat strong{display:block;font-size:clamp(18px,4vw,25px);margin-top:2px}
+.stat{min-width:100px;text-align:center;padding:8px 16px;background:rgba(255,255,255,.82);border:2px solid #fff;border-radius:16px;box-shadow:0 4px 0 rgba(48,94,122,.12)}
+.stat small{display:block;color:#54728a;font-size:9px;font-weight:900;letter-spacing:.13em}.stat strong{display:block;font-size:clamp(18px,4vw,25px);margin-top:2px}
 .bottom{margin-top:auto;display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
-.hint{font-size:11px;line-height:1.5;color:#a8b9d8;letter-spacing:.04em;text-shadow:0 2px 10px #020617}.hint b{color:#fff}
-.iconbtn{pointer-events:auto;border:1px solid rgba(133,167,224,.35);background:rgba(10,20,45,.78);color:#dffaff;border-radius:12px;width:42px;height:42px;font-size:16px;cursor:pointer;backdrop-filter:blur(8px)}
-.overlay{position:absolute;z-index:5;inset:0;display:grid;place-items:center;padding:22px;background:linear-gradient(180deg,rgba(3,7,20,.25),rgba(3,7,20,.76));}
-.card{width:min(100%,370px);padding:clamp(22px,5vw,34px);border-radius:26px;text-align:center;background:linear-gradient(145deg,rgba(19,34,73,.95),rgba(7,13,33,.96));border:1px solid rgba(124,168,255,.32);box-shadow:0 28px 90px #020615a8, inset 0 1px rgba(255,255,255,.08)}
-.eyebrow{color:var(--cyan);font-weight:900;font-size:10px;letter-spacing:.26em;text-transform:uppercase}
-h1{font-size:clamp(36px,9vw,58px);line-height:.95;letter-spacing:-.06em;margin:13px 0 10px;text-shadow:0 0 30px #5ce9ff45}
-.subtitle{font-size:13px;line-height:1.6;color:#aabbdc;margin:0 auto 20px;max-width:275px}
-.shipmark{margin:0 auto 17px;width:84px;height:84px;display:grid;place-items:center;border-radius:25px;background:radial-gradient(circle at 35% 25%,#3f6da7,#14264f 68%);border:1px solid #6b8bc0;box-shadow:inset 0 1px 10px #a9f7ff28,0 10px 30px #010615}
-.shipmark span{font-size:43px;filter:drop-shadow(0 0 12px #54dcff)}
-.primary{width:100%;border:0;border-radius:14px;padding:15px 18px;background:linear-gradient(100deg,#5aeaff,#7f9dff);color:#071126;font-size:13px;font-weight:950;letter-spacing:.13em;text-transform:uppercase;cursor:pointer;box-shadow:0 7px 25px #4bcbff33;transition:transform .12s,filter .12s}
+.hint{font-size:11px;line-height:1.5;color:#315b77;letter-spacing:.02em;text-shadow:0 1px 0 rgba(255,255,255,.35)}.hint b{color:#243a56}
+.iconbtn{pointer-events:auto;border:2px solid #fff;background:#fff;color:#36536c;border-radius:14px;width:42px;height:42px;font-size:16px;cursor:pointer;box-shadow:0 3px 0 rgba(48,94,122,.12)}
+.overlay{position:absolute;z-index:5;inset:0;display:grid;place-items:center;padding:22px;background:rgba(54,117,151,.20)}
+.card{width:min(100%,370px);padding:clamp(22px,5vw,34px);border-radius:28px;text-align:center;background:#fffdf4;border:3px solid #fff;box-shadow:0 7px 0 rgba(55,104,131,.20),0 18px 45px rgba(38,77,101,.16)}
+.eyebrow{color:#e48b32;font-weight:900;font-size:10px;letter-spacing:.20em;text-transform:uppercase}
+h1{font-size:clamp(36px,9vw,58px);line-height:.95;letter-spacing:-.055em;margin:13px 0 10px;color:#263a54;text-shadow:0 3px 0 rgba(38,58,84,.08)}
+.subtitle{font-size:13px;line-height:1.6;color:#60788b;margin:0 auto 20px;max-width:275px}
+.shipmark{margin:0 auto 17px;width:84px;height:84px;display:grid;place-items:center;border-radius:26px;background:#ffdc79;border:3px solid #fff;box-shadow:0 4px 0 #efb64e}
+.shipmark span{font-size:43px;filter:none}
+.primary{width:100%;border:0;border-radius:15px;padding:15px 18px;background:#ffca45;color:#263a54;font-size:13px;font-weight:950;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;box-shadow:0 5px 0 #e6a72b;transition:transform .12s,filter .12s}
 .primary:active{transform:scale(.98);filter:brightness(.94)}
-.secondary{margin-top:10px;width:100%;border:1px solid #34466e;border-radius:13px;padding:12px;background:#0c1734;color:#c9d8f4;font-size:11px;font-weight:800;letter-spacing:.12em;cursor:pointer}
-.controls{display:flex;gap:8px;justify-content:center;margin-top:17px;color:#91a9d2;font-size:10px;letter-spacing:.05em}
-.key{display:inline-grid;place-items:center;min-width:24px;height:22px;padding:0 6px;border:1px solid #435781;border-radius:6px;color:#e4f5ff;background:#17294c;font-weight:800;margin-right:4px}
+.secondary{margin-top:10px;width:100%;border:2px solid #dce8ec;border-radius:13px;padding:12px;background:#f4fafb;color:#426078;font-size:11px;font-weight:900;letter-spacing:.08em;cursor:pointer}
+.controls{display:flex;gap:8px;justify-content:center;margin-top:17px;color:#678296;font-size:10px;letter-spacing:.03em}
+.key{display:inline-grid;place-items:center;min-width:24px;height:22px;padding:0 6px;border:1px solid #d3e1e7;border-radius:7px;color:#426078;background:#f0f7fa;font-weight:900;margin-right:4px}
 .hidden{display:none!important}
-.gameover-score{font-size:44px;font-weight:900;letter-spacing:-.04em;margin:5px 0}.bestline{font-size:11px;color:#9bb0d7;margin-bottom:18px}
+.gameover-score{font-size:44px;font-weight:900;letter-spacing:-.04em;margin:5px 0}.bestline{font-size:11px;color:#60788b;margin-bottom:12px}
+.walletline{font-size:12px;font-weight:900;color:#b47a16;margin:7px 0 12px}
+.reward-note{font-size:10px;color:#6d8797;line-height:1.4;margin:8px 0 0}
+.reward-btn{margin-top:9px;width:100%;border:2px solid #8dcf88;border-radius:13px;padding:12px;background:#efffed;color:#286c42;font-size:11px;font-weight:950;letter-spacing:.04em;cursor:pointer}
+.reward-btn:disabled{opacity:.55;cursor:wait}
 #toast{position:absolute;z-index:4;top:24%;left:50%;transform:translate(-50%,-8px);opacity:0;color:#baf8ff;font-size:12px;font-weight:900;letter-spacing:.16em;text-shadow:0 0 15px #4ae5ff;transition:opacity .18s,transform .18s;pointer-events:none}
 #toast.show{opacity:1;transform:translate(-50%,0)}
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto;transition:none!important}}
-
-#site-home-link{position:absolute;z-index:10;left:10px;bottom:10px;display:inline-flex;align-items:center;gap:6px;padding:9px 12px;border:1px solid rgba(148,174,220,.55);border-radius:999px;background:rgba(5,10,28,.82);color:#f5f8ff;text-decoration:none;font:700 12px/1.2 system-ui,sans-serif;backdrop-filter:blur(8px)}#site-home-link:focus-visible{outline:3px solid #59e7ff;outline-offset:3px}
 </style>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2129877342025466" crossorigin="anonymous"></script>
+<script>
+  window.adsbygoogle = window.adsbygoogle || [];
+  var adBreak = window.adBreak || function(o) { window.adsbygoogle.push(o); };
+  var adConfig = window.adConfig || function(o) { window.adsbygoogle.push(o); };
+  adConfig({preloadAdBreaks: 'on'});
+</script>
 </head>
 <body>
 <div id="shell" aria-label="Rocket Dash game">
-<a id="site-home-link" href="/" aria-label="Back to the games homepage">← Back to games</a>
 <canvas id="game" aria-label="Rocket Dash playfield"></canvas>
 <div class="hud">
   <div class="top">
@@ -76,9 +79,9 @@ h1{font-size:clamp(36px,9vw,58px);line-height:.95;letter-spacing:-.06em;margin:1
 <div class="overlay" id="startOverlay">
   <div class="card">
     <div class="shipmark"><span>🚀</span></div>
-    <div class="eyebrow">A one-tap space challenge</div>
-    <h1>ROCKET<br><span style="color:var(--cyan)">DASH</span></h1>
-    <p class="subtitle">Slip through neon gates, scoop up stars, and see how far your reflexes can take you.</p>
+    <div class="eyebrow">An easy, happy little arcade adventure</div>
+    <h1>ROCKET<br><span style="color:#ff8b5c">DASH</span></h1>
+    <p class="subtitle">Zip past playful gates, collect stars, and spend 25 stars to continue your flight!</p>
     <button class="primary" id="startBtn">Launch mission&nbsp; ↗</button>
     <div class="controls"><span><i class="key">TAP</i> THRUST</span><span><i class="key">SPACE</i> DESKTOP</span></div>
   </div>
@@ -86,9 +89,13 @@ h1{font-size:clamp(36px,9vw,58px);line-height:.95;letter-spacing:-.06em;margin:1
 <div class="overlay hidden" id="overOverlay">
   <div class="card">
     <div class="eyebrow" id="resultEyebrow">Mission ended</div>
-    <h1 style="font-size:38px">FLIGHT<br><span style="color:var(--cyan)">COMPLETE</span></h1>
+    <h1 style="font-size:38px">FLIGHT<br><span style="color:#ff8b5c">COMPLETE</span></h1>
     <div class="gameover-score" id="finalScore">0</div>
     <div class="bestline" id="resultLine">Distance travelled</div>
+    <div class="walletline" id="walletLine">⭐ Star bank: 0</div>
+    <button class="primary hidden" id="continueBtn">Continue · 25 ⭐</button>
+    <button class="reward-btn" id="watchAdBtn">▶ Watch ad · earn 10 ⭐</button>
+    <div class="reward-note" id="rewardNote">Watch a rewarded ad to earn stars. Availability may vary.</div>
     <button class="primary" id="restartBtn">Fly again&nbsp; ↻</button>
     <button class="secondary" id="homeBtn">MAIN MENU</button>
   </div>
@@ -111,8 +118,9 @@ const $=id=>document.getElementById(id);
 let W=0,H=0,DPR=1, state='ready', last=0, time=0, score=0, stars=0, best=0;
 let rocket={x:0,y:0,vy:0,tilt:0}, gates=[], particles=[], starItems=[], bgStars=[];
 let speed=245, spawnTimer=0, soundOn=true, audioCtx=null, shake=0, flash=0, newBest=false;
-let adInProgress=false, runsSinceAd=0, hasStartedOnce=false;
+let starBank=0, continueUsed=false, continueInvulnerable=0, adInProgress=false;
 try{best=Number(localStorage.getItem('rocketDashBest')||0)||0}catch(e){}
+try{starBank=Math.max(0,Number(localStorage.getItem('rocketDashStarBank')||0)||0)}catch(e){}
 $('best').textContent=String(best).padStart(3,'0');
 function resize(){
  const r=shell.getBoundingClientRect();DPR=Math.min(window.devicePixelRatio||1,2);W=r.width;H=r.height;
@@ -131,105 +139,151 @@ function sound(freq=440,dur=.07,type='sine',vol=.035){
  o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+dur)}catch(e){}
 }
 function reset(){
- score=0;stars=0;time=0;speed=Math.max(225,W*.36);spawnTimer=.9;gates=[];particles=[];starItems=[];shake=0;flash=0;newBest=false;
- rocket={x:W*.25,y:H*.48,vy:0,tilt:0};
- for(let i=0;i<3;i++)spawnGate(W+i*W*.57+120);
+ score=0;stars=0;time=0;continueUsed=false;continueInvulnerable=0;
+ // Easy, viewport-scaled tuning: consistent play feel on portrait and desktop layouts.
+ speed=W*.27;spawnTimer=1.65;gates=[];particles=[];starItems=[];shake=0;flash=0;newBest=false;
+ rocket={x:W*.24,y:H*.50,vy:0,tilt:0};
+ lastGateCenter=H*.50;
+ for(let i=0;i<3;i++)spawnGate(W+i*W*.64+100);
  updateHUD();
 }
-function start(){reset();state='playing';$('startOverlay').classList.add('hidden');$('overOverlay').classList.add('hidden');$('pauseOverlay').classList.add('hidden');$('hint').innerHTML='<b>TAP / CLICK</b> to thrust upward<br><span>Watch the gap. Flight speed increases over time.</span>';boost();last=performance.now()}
-function boost(){if(state!=='playing')return;rocket.vy=-H*.58;sound(520,.055,'triangle',.026);for(let i=0;i<5;i++)particles.push({x:rocket.x-13,y:rocket.y+10,vx:rand(-110,-30),vy:rand(20,95),life:rand(.18,.42),max:.42,size:rand(2,5),color:Math.random()>.4?'#64eaff':'#ffb45d'})}
+function start(){reset();state='playing';$('startOverlay').classList.add('hidden');$('overOverlay').classList.add('hidden');$('pauseOverlay').classList.add('hidden');$('hint').innerHTML='<b>TAP / CLICK</b> to gently boost<br><span>Wide gaps and steady speed — take your time!</span>';boost();last=performance.now()}
+function boost(){if(state!=='playing')return;rocket.vy=-H*.40;sound(520,.055,'triangle',.026);for(let i=0;i<4;i++)particles.push({x:rocket.x-13,y:rocket.y+10,vx:rand(-75,-20),vy:rand(12,55),life:rand(.18,.36),max:.36,size:rand(2,4),color:Math.random()>.4?'#64eaff':'#ffb45d'})}
+let lastGateCenter=0;
 function spawnGate(x=W+60){
- const gap=Math.max(142,Math.min(210,H*.25)-Math.max(0,time-12)*1.1);
- const margin=Math.max(75,H*.13),center=rand(margin+gap/2,H-margin-gap/2);
- const width=Math.max(48,Math.min(68,W*.13));
- gates.push({x,center,gap,width,passed:false,seed:Math.random()*10});
- if(Math.random()<.88)starItems.push({x:x+width+rand(45,90),y:center+rand(-gap*.2,gap*.2),r:10,got:false,phase:Math.random()*6});
+ // Random small / medium / big gate styles. Bigger gates still keep a generous opening.
+ const roll=Math.random();
+ const size=roll<.38?'small':roll<.78?'medium':'big';
+ const gapRatio=size==='small'?.46:size==='medium'?.43:.40;
+ const gap=Math.max(176,H*gapRatio);
+ const half=gap/2;
+ const margin=Math.max(25,H*.06);
+ const minCenter=margin+half, maxCenter=H-margin-half;
+ const maxStep=H*.065;
+ const previous=lastGateCenter || H*.5;
+ const center=Math.max(minCenter,Math.min(maxCenter,previous+rand(-maxStep,maxStep)));
+ lastGateCenter=center;
+ const width=size==='small'?Math.max(30,Math.min(38,W*.065)):
+             size==='medium'?Math.max(38,Math.min(46,W*.078)):
+             Math.max(44,Math.min(54,W*.09));
+ gates.push({x,center,gap,width,size,passed:false,seed:Math.random()*10});
+ // Stars stay near the centre of the safe passage; collecting them is optional.
+ if(Math.random()<.72)starItems.push({x:x+width+rand(55,82),y:center+rand(-gap*.10,gap*.10),r:10,got:false,phase:Math.random()*6});
 }
 function update(dt){
- time+=dt;speed=Math.min(W*.72, W*.36+time*2.6);rocket.vy+=H*1.18*dt;rocket.y+=rocket.vy*dt;rocket.tilt=Math.max(-.45,Math.min(.9,rocket.vy/(H*.9)));
- spawnTimer-=dt;if(spawnTimer<=0){spawnGate(W+80);spawnTimer=Math.max(.82,1.36-time*.008)}
+ time+=dt;continueInvulnerable=Math.max(0,continueInvulnerable-dt);speed=W*(.27+Math.min(.055,time*.0015));rocket.vy+=H*.82*dt;rocket.y+=rocket.vy*dt;rocket.tilt=Math.max(-.32,Math.min(.55,rocket.vy/(H*.95)));
+ spawnTimer-=dt;if(spawnTimer<=0){spawnGate(W+80);spawnTimer=1.65}
  for(const g of gates){g.x-=speed*dt;
   if(!g.passed&&g.x+g.width<rocket.x){g.passed=true;score+=10;burst(rocket.x,rocket.y,'#5ceaff',9);sound(720,.05,'sine',.018)}
-  if(rocket.x+13>g.x&&rocket.x-13<g.x+g.width){
-   if(rocket.y-12<g.center-g.gap/2||rocket.y+12>g.center+g.gap/2){crash();return}
+  if(continueInvulnerable<=0&&rocket.x+10>g.x&&rocket.x-10<g.x+g.width){
+   // Forgiving hitbox: only the rocket's core must fit through the wide opening.
+   if(rocket.y-8<g.center-g.gap/2||rocket.y+8>g.center+g.gap/2){crash();return}
   }
  }
  gates=gates.filter(g=>g.x+g.width>-20);
  for(const s of starItems){s.x-=speed*dt;s.phase+=dt*4;
-  if(!s.got&&Math.hypot(s.x-rocket.x,s.y-rocket.y)<24){s.got=true;stars++;score+=25;flash=.2;burst(s.x,s.y,'#ffe88b',15);sound(920,.1,'sine',.045);$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),420)}
+  if(!s.got&&Math.hypot(s.x-rocket.x,s.y-rocket.y)<24){s.got=true;stars++;starBank++;try{localStorage.setItem('rocketDashStarBank',String(starBank))}catch(e){}score+=25;flash=.2;burst(s.x,s.y,'#ffe88b',15);sound(920,.1,'sine',.045);$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),420)}
  }
  starItems=starItems.filter(s=>s.x>-30&&!s.got);
  score+=dt*2.2;shake=Math.max(0,shake-dt*22);flash=Math.max(0,flash-dt);
  for(const p of particles){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=Math.pow(.1,dt);p.vy+=45*dt;p.life-=dt}
  particles=particles.filter(p=>p.life>0);
  for(const s of bgStars){s.x-=speed*dt*s.z*.12;if(s.x<0){s.x=W+2;s.y=Math.random()*H}}
- if(rocket.y>H-48||rocket.y<42){crash();return}
+ if(rocket.y>H-28||rocket.y<24){crash();return}
  updateHUD();
 }
-function updateHUD(){$('score').textContent=String(Math.floor(score)).padStart(3,'0');$('stars').textContent=stars;$('best').textContent=String(Math.max(best,Math.floor(score))).padStart(3,'0')}
+function updateHUD(){$('score').textContent=String(Math.floor(score)).padStart(3,'0');$('stars').textContent=stars;$('best').textContent=String(Math.max(best,Math.floor(score))).padStart(3,'0');if($('walletLine'))$('walletLine').textContent=`⭐ Star bank: ${starBank}`}
 function burst(x,y,color,n){for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,v=rand(40,220);particles.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:rand(.25,.65),max:.65,size:rand(2,5),color})}}
 function crash(){
  if(state!=='playing')return;state='over';shake=13;flash=.4;sound(130,.22,'sawtooth',.045);burst(rocket.x,rocket.y,'#ff7b92',28);
  const final=Math.floor(score);newBest=final>best;if(newBest){best=final;try{localStorage.setItem('rocketDashBest',String(best))}catch(e){}}
- $('finalScore').textContent=final;$('resultLine').textContent=(newBest?'✦ NEW PERSONAL BEST  ·  ':'')+` ${stars} star${stars===1?'':'s'} collected`; $('resultEyebrow').textContent=newBest?'New record achieved':'Mission ended';updateHUD();
+ $('finalScore').textContent=final;
+ $('resultLine').textContent=(newBest?'✦ NEW PERSONAL BEST · ':'')+`${stars} star${stars===1?'':'s'} collected this run`;
+ $('resultEyebrow').textContent=newBest?'New record achieved':'Flight paused — try again!';
+ $('walletLine').textContent=`⭐ Star bank: ${starBank}`;
+ $('continueBtn').classList.toggle('hidden',continueUsed||starBank<25);
+ $('watchAdBtn').disabled=false;
+ $('rewardNote').textContent=continueUsed?'Continue already used this run. Start a new run to play again.':'Spend 25 banked stars to continue, or watch a rewarded ad to earn 10 more.';
+ updateHUD();
  setTimeout(()=>{if(state==='over')$('overOverlay').classList.remove('hidden')},420);
 }
 function drawBackground(){
- const grad=ctx.createLinearGradient(0,0,0,H);grad.addColorStop(0,'#0a1740');grad.addColorStop(.55,'#0b1b3b');grad.addColorStop(1,'#060b20');ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
- const neb=ctx.createRadialGradient(W*.73,H*.38,5,W*.73,H*.38,W*.68);neb.addColorStop(0,'rgba(48,100,180,.24)');neb.addColorStop(1,'rgba(24,35,90,0)');ctx.fillStyle=neb;ctx.fillRect(0,0,W,H);
- for(const s of bgStars){ctx.globalAlpha=.25+s.z*.65;ctx.fillStyle=s.z>.7?'#d8f8ff':'#8caee9';ctx.beginPath();ctx.arc(s.x,s.y,s.r*s.z,0,Math.PI*2);ctx.fill()}ctx.globalAlpha=1;
- // distant planetary arc
- ctx.save();ctx.globalAlpha=.2;ctx.strokeStyle='#608bd5';ctx.lineWidth=1;
- ctx.beginPath();ctx.ellipse(W*.79,H*.69,W*.45,H*.17,-.28,Math.PI*1.02,Math.PI*1.9);ctx.stroke();ctx.restore();
- // subtle perspective grid at bottom
- ctx.save();ctx.strokeStyle='rgba(68,133,211,.13)';ctx.lineWidth=1;
- for(let i=0;i<12;i++){const y=H*.78+Math.pow(i/12,1.6)*H*.28;ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}
- for(let i=-8;i<10;i++){ctx.beginPath();ctx.moveTo(W*.5+i*W*.09,H);ctx.lineTo(W*.5+i*W*.03,H*.75);ctx.stroke()}ctx.restore();
+ // Flat sky with playful rolling hills: deliberately no perspective grid or glossy space gradients.
+ ctx.fillStyle='#9be3ff';ctx.fillRect(0,0,W,H);
+ // soft sun
+ ctx.fillStyle='#ffe27a';ctx.beginPath();ctx.arc(W*.82,H*.18,Math.min(W,H)*.075,0,Math.PI*2);ctx.fill();
+ // simple puffy clouds
+ function cloud(x,y,s){
+   ctx.save();ctx.translate(x,y);ctx.scale(s,s);
+   ctx.fillStyle='#f8fdff';ctx.beginPath();
+   ctx.arc(0,8,17,Math.PI,0);ctx.arc(17,-2,22,Math.PI,0);ctx.arc(39,8,16,Math.PI,0);
+   ctx.lineTo(55,17);ctx.lineTo(-17,17);ctx.closePath();ctx.fill();
+   ctx.restore();
+ }
+ const drift=(time*12)%(W+180);
+ cloud(((W*.18-drift+W+180)%(W+180))-70,H*.17,.8);
+ cloud(((W*.68-drift*.65+W+180)%(W+180))-60,H*.31,.62);
+ // rounded green hills
+ ctx.fillStyle='#75d66b';ctx.beginPath();ctx.moveTo(0,H*.78);
+ ctx.quadraticCurveTo(W*.22,H*.68,W*.42,H*.79);
+ ctx.quadraticCurveTo(W*.68,H*.88,W,H*.72);ctx.lineTo(W,H);ctx.lineTo(0,H);ctx.closePath();ctx.fill();
+ ctx.fillStyle='#53c85d';ctx.beginPath();ctx.moveTo(0,H*.9);
+ ctx.quadraticCurveTo(W*.34,H*.78,W*.62,H*.91);
+ ctx.quadraticCurveTo(W*.82,H*.98,W,H*.86);ctx.lineTo(W,H);ctx.lineTo(0,H);ctx.closePath();ctx.fill();
+ // tiny decorative star sparkles
+ ctx.fillStyle='#fff7c2';
+ for(let i=0;i<7;i++){
+   const x=((i*137+W-(time*8)%(W+20))%(W+20));
+   const y=H*(.12+(i%4)*.105);
+   ctx.beginPath();ctx.arc(x,y,1.7,0,Math.PI*2);ctx.fill();
+ }
 }
 function drawGate(g){
- const topH=g.center-g.gap/2,bottomY=g.center+g.gap/2;
+ const topH=g.center-g.gap/2,bottomY=g.center+g.gap/2,x=g.x,w=g.width;
+ // Chunky rounded candy gates, with a clear dark outline and a small flat highlight.
  for(const part of [{y:0,h:topH},{y:bottomY,h:H-bottomY}]){
-  if(part.h<=0)continue;
-  const x=g.x,w=g.width;
-  const gr=ctx.createLinearGradient(x,0,x+w,0);gr.addColorStop(0,'#172a5b');gr.addColorStop(.22,'#4568a4');gr.addColorStop(.5,'#203c78');gr.addColorStop(.78,'#142550');gr.addColorStop(1,'#08142e');
-  ctx.fillStyle=gr;ctx.fillRect(x,part.y,w,part.h);
-  ctx.fillStyle='rgba(150,215,255,.17)';ctx.fillRect(x+7,part.y,3,part.h);
-  ctx.fillStyle='rgba(0,0,0,.28)';ctx.fillRect(x+w-7,part.y,7,part.h);
-  const capY=part.y===0?topH-12:bottomY;
-  ctx.save();ctx.shadowColor='#42eaff';ctx.shadowBlur=13;ctx.fillStyle='#4ceaff';ctx.fillRect(x-5,capY,w+10,12);ctx.restore();
-  const cap=ctx.createLinearGradient(0,capY,0,capY+12);cap.addColorStop(0,'#c4ffff');cap.addColorStop(.35,'#4be5ff');cap.addColorStop(1,'#236cb6');ctx.fillStyle=cap;ctx.fillRect(x-5,capY,w+10,12);
-  ctx.fillStyle='rgba(255,255,255,.65)';ctx.fillRect(x+2,capY+2,w-4,2);
+   if(part.h<=0)continue;
+   ctx.fillStyle=g.size==='small'?'#ff9f70':g.size==='medium'?'#ff8b5c':'#f47768';
+   roundRect(ctx,x,part.y,w,part.h,Math.min(12,w*.22));ctx.fill();
+   ctx.strokeStyle='#d85b4d';ctx.lineWidth=3;ctx.stroke();
+   ctx.fillStyle='#ffb18b';
+   roundRect(ctx,x+6,part.y+4,Math.max(5,w*.18),Math.max(0,part.h-8),4);ctx.fill();
+   const capY=part.y===0?topH-12:bottomY;
+   ctx.fillStyle='#ffe16a';roundRect(ctx,x-5,capY,w+10,14,6);ctx.fill();
+   ctx.strokeStyle='#d99a35';ctx.lineWidth=3;ctx.stroke();
+   ctx.fillStyle='#fff3ad';roundRect(ctx,x+2,capY+2,w-4,4,2);ctx.fill();
  }
- // gate glow rings
- ctx.save();ctx.globalAlpha=.12;ctx.strokeStyle='#63edff';ctx.lineWidth=2;ctx.strokeRect(g.x-9,topH-3,g.width+18,18);ctx.strokeRect(g.x-9,bottomY-3,g.width+18,18);ctx.restore();
 }
 function drawStar(s){
- const pulse=1+Math.sin(s.phase)*.12;ctx.save();ctx.translate(s.x,s.y);ctx.scale(pulse,pulse);ctx.shadowColor='#ffe77a';ctx.shadowBlur=17;
- const gr=ctx.createRadialGradient(-3,-4,1,0,0,12);gr.addColorStop(0,'#fffbd1');gr.addColorStop(.4,'#ffe66e');gr.addColorStop(1,'#ff9d42');ctx.fillStyle=gr;
- ctx.beginPath();for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,r=i%2?4.5:10;const x=Math.cos(a)*r,y=Math.sin(a)*r;i?ctx.lineTo(x,y):ctx.moveTo(x,y)}ctx.closePath();ctx.fill();
+ const pulse=1+Math.sin(s.phase)*.12;ctx.save();ctx.translate(s.x,s.y);ctx.scale(pulse,pulse);ctx.fillStyle='#ffe16a';ctx.strokeStyle='#d99a35';ctx.lineWidth=2;
+ ctx.beginPath();for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,r=i%2?4.5:10;const x=Math.cos(a)*r,y=Math.sin(a)*r;i?ctx.lineTo(x,y):ctx.moveTo(x,y)}ctx.closePath();ctx.fill();ctx.stroke();
  ctx.restore();
 }
 function drawRocket(){
- ctx.save();ctx.translate(rocket.x,rocket.y);ctx.rotate(rocket.tilt);
- // exhaust
- if(state==='playing'){const f=rand(0,1);const flame=ctx.createLinearGradient(-29,0,-10,0);flame.addColorStop(0,'rgba(255,91,73,0)');flame.addColorStop(.45,'#ff9958');flame.addColorStop(1,'#e9ffff');ctx.fillStyle=flame;ctx.beginPath();ctx.moveTo(-12,-5);ctx.quadraticCurveTo(-24,0,-13+f*-10,4);ctx.quadraticCurveTo(-20,0,-12,5);ctx.fill()}
- // shadow
- ctx.fillStyle='rgba(0,0,0,.35)';ctx.beginPath();ctx.ellipse(0,15,19,5,0,0,Math.PI*2);ctx.fill();
+ ctx.save();ctx.translate(rocket.x,rocket.y);ctx.rotate(rocket.tilt*.65);
+ // Simple sticker-like rocket: bold outline, solid colors, no metallic gradients or realistic shadow.
+ if(state==='playing'){
+   const flameLen=rand(11,22);
+   ctx.fillStyle='#ff8b45';ctx.strokeStyle='#b94d43';ctx.lineWidth=2.5;
+   ctx.beginPath();ctx.moveTo(-11,8);ctx.quadraticCurveTo(-flameLen,4,-12,-1);ctx.quadraticCurveTo(-8,5,-7,8);ctx.closePath();ctx.fill();ctx.stroke();
+   ctx.fillStyle='#ffe16a';ctx.beginPath();ctx.moveTo(-10,5);ctx.quadraticCurveTo(-flameLen*.65,4,-11,1);ctx.quadraticCurveTo(-8,4,-7,5);ctx.closePath();ctx.fill();
+ }
  // fins
- const fin=ctx.createLinearGradient(0,-8,0,13);fin.addColorStop(0,'#ff826b');fin.addColorStop(1,'#a82d59');ctx.fillStyle=fin;
- ctx.beginPath();ctx.moveTo(-8,2);ctx.lineTo(-18,12);ctx.lineTo(-5,11);ctx.lineTo(0,4);ctx.fill();
- ctx.beginPath();ctx.moveTo(7,2);ctx.lineTo(17,12);ctx.lineTo(5,11);ctx.lineTo(0,4);ctx.fill();
- // body
- const body=ctx.createLinearGradient(-11,-13,10,8);body.addColorStop(0,'#ffffff');body.addColorStop(.28,'#bceaff');body.addColorStop(.62,'#6b9bd2');body.addColorStop(1,'#294b85');
- ctx.fillStyle=body;ctx.beginPath();ctx.moveTo(0,-21);ctx.bezierCurveTo(8,-13,11,-4,9,7);ctx.quadraticCurveTo(0,13,-9,7);ctx.bezierCurveTo(-11,-4,-8,-13,0,-21);ctx.fill();
- ctx.strokeStyle='rgba(255,255,255,.7)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(0,-18);ctx.quadraticCurveTo(-5,-7,-4,5);ctx.stroke();
+ ctx.fillStyle='#ff7d72';ctx.strokeStyle='#263a54';ctx.lineWidth=3;ctx.lineJoin='round';
+ ctx.beginPath();ctx.moveTo(-7,3);ctx.lineTo(-18,11);ctx.lineTo(-5,12);ctx.lineTo(1,5);ctx.closePath();ctx.fill();ctx.stroke();
+ ctx.beginPath();ctx.moveTo(7,3);ctx.lineTo(18,11);ctx.lineTo(5,12);ctx.lineTo(-1,5);ctx.closePath();ctx.fill();ctx.stroke();
+ // main body
+ ctx.fillStyle='#fffdf4';ctx.beginPath();ctx.moveTo(0,-23);ctx.quadraticCurveTo(13,-11,10,5);ctx.quadraticCurveTo(0,13,-10,5);ctx.quadraticCurveTo(-13,-11,0,-23);ctx.closePath();ctx.fill();ctx.stroke();
+ // side stripe
+ ctx.fillStyle='#ffca45';ctx.fillRect(-8,-1,16,5);
  // window
- ctx.save();ctx.shadowColor='#51eaff';ctx.shadowBlur=10;const win=ctx.createLinearGradient(-5,-8,5,2);win.addColorStop(0,'#eaffff');win.addColorStop(.45,'#5de5ff');win.addColorStop(1,'#1b4e91');ctx.fillStyle=win;ctx.beginPath();ctx.ellipse(0,-5,5,6,0,0,Math.PI*2);ctx.fill();ctx.restore();
- // nose highlight
- ctx.fillStyle='#fff';ctx.beginPath();ctx.ellipse(-2,-15,2,4,-.3,0,Math.PI*2);ctx.fill();
+ ctx.fillStyle='#72d9f6';ctx.beginPath();ctx.arc(0,-7,5.5,0,Math.PI*2);ctx.fill();ctx.stroke();
+ ctx.fillStyle='#dff9ff';ctx.beginPath();ctx.arc(-1.5,-9,1.7,0,Math.PI*2);ctx.fill();
+ // nose tip accent
+ ctx.fillStyle='#ff7d72';ctx.beginPath();ctx.moveTo(-4,-19);ctx.lineTo(0,-25);ctx.lineTo(4,-19);ctx.closePath();ctx.fill();
  ctx.restore();
 }
-function drawParticles(){for(const p of particles){ctx.globalAlpha=Math.max(0,p.life/p.max);ctx.fillStyle=p.color;ctx.shadowColor=p.color;ctx.shadowBlur=8;ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fill()}ctx.globalAlpha=1;ctx.shadowBlur=0}
+function drawParticles(){for(const p of particles){ctx.globalAlpha=Math.max(0,p.life/p.max);ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fill()}ctx.globalAlpha=1;ctx.shadowBlur=0}
 function draw(){
  ctx.save();if(shake>0)ctx.translate(rand(-shake,shake),rand(-shake,shake));
  drawBackground();
@@ -242,66 +296,69 @@ function draw(){
 function frame(now){const dt=Math.min(.035,(now-last)/1000||0);last=now;if(state==='playing')update(dt);else if(state==='over'){for(const p of particles){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=120*dt;p.life-=dt}particles=particles.filter(p=>p.life>0);shake=Math.max(0,shake-dt*20);flash=Math.max(0,flash-dt)}draw();requestAnimationFrame(frame)}
 function togglePause(){if(state==='playing'){state='paused';$('pauseOverlay').classList.remove('hidden');$('pauseBtn').textContent='▶'}else if(state==='paused'){state='playing';$('pauseOverlay').classList.add('hidden');$('pauseBtn').textContent='Ⅱ';last=performance.now()}}
 function action(){if(state==='playing')boost();else if(state==='ready')start();else if(state==='over'){start()}else if(state==='paused')togglePause()}
-$('startBtn').addEventListener('click',launchWithAd);$('restartBtn').addEventListener('click',restartWithAd);
+function continueFlight(){
+ if(state!=='over'||continueUsed||starBank<25)return;
+ starBank-=25;continueUsed=true;continueInvulnerable=2.2;
+ try{localStorage.setItem('rocketDashStarBank',String(starBank))}catch(e){}
+ $('overOverlay').classList.add('hidden');state='playing';
+ // Clear obstacles close to the rocket to prevent an unavoidable immediate collision.
+ gates=gates.filter(g=>g.x>rocket.x+W*.28);
+ starItems=starItems.filter(s=>s.x>rocket.x+W*.20);
+ rocket.y=H*.5;rocket.vy=0;rocket.tilt=0;boost();
+ $('walletLine').textContent=`⭐ Star bank: ${starBank}`;
+ $('hint').innerHTML='<b>CONTINUE!</b> You are protected briefly<br><span>Keep flying and collect more stars.</span>';
+ last=performance.now();updateHUD();
+}
+function watchRewardAd(){
+ if(adInProgress)return;
+ if(typeof window.adBreak!=='function'){
+   $('rewardNote').textContent='Ads are not available right now. Please try again later.';
+   return;
+ }
+ adInProgress=true;$('watchAdBtn').disabled=true;
+ $('rewardNote').textContent='Loading a rewarded ad…';
+ let rewarded=false;
+ try{
+   window.adBreak({
+     type:'reward',
+     name:'rocket-dash-earn-stars',
+     beforeReward: function(showAdFn){
+       $('rewardNote').textContent='Watch the ad to earn 10 stars.';
+       if(typeof showAdFn==='function')showAdFn();
+     },
+     adViewed: function(){
+       if(rewarded)return;rewarded=true;starBank+=10;
+       try{localStorage.setItem('rocketDashStarBank',String(starBank))}catch(e){}
+       $('walletLine').textContent=`⭐ Star bank: ${starBank}`;
+       $('rewardNote').textContent='Thanks for watching! 10 stars added.';
+       $('continueBtn').classList.toggle('hidden',continueUsed||starBank<25);
+       updateHUD();
+     },
+     adDismissed: function(){
+       $('rewardNote').textContent='Ad closed before completion. No stars awarded.';
+     },
+     adBreakDone: function(info){
+       adInProgress=false;$('watchAdBtn').disabled=false;
+       if(!rewarded && (!info || info.breakStatus!=='viewed')){
+         $('rewardNote').textContent='No rewarded ad was available. Your stars have not changed.';
+       }
+     }
+   });
+ }catch(e){
+   adInProgress=false;$('watchAdBtn').disabled=false;
+   $('rewardNote').textContent='Could not load an ad. Please try again later.';
+ }
+}
+$('continueBtn').addEventListener('click',continueFlight);
+$('watchAdBtn').addEventListener('click',watchRewardAd);
+$('startBtn').addEventListener('click',start);$('restartBtn').addEventListener('click',start);
 $('homeBtn').addEventListener('click',()=>{state='ready';$('overOverlay').classList.add('hidden');$('startOverlay').classList.remove('hidden');rocket={x:W*.25,y:H*.48,vy:0,tilt:0};gates=[];starItems=[]});
 $('pauseBtn').addEventListener('click',()=>{if(state==='playing'||state==='paused')togglePause()});
 $('resumeBtn').addEventListener('click',togglePause);$('quitBtn').addEventListener('click',()=>{state='over';$('pauseOverlay').classList.add('hidden');$('overOverlay').classList.remove('hidden');$('finalScore').textContent=Math.floor(score);$('resultLine').textContent='Run ended early · '+stars+' stars collected'});
-$('soundBtn').addEventListener('click',()=>{soundOn=!soundOn;$('soundBtn').textContent=soundOn?'♫':'♪';$('soundBtn').style.opacity=soundOn?'1':'.55';try { if (typeof window.adConfig === 'function') window.adConfig({sound: soundOn ? 'on' : 'off'}); } catch(e) {}
-if(soundOn)sound(600,.05)});
+$('soundBtn').addEventListener('click',()=>{soundOn=!soundOn;$('soundBtn').textContent=soundOn?'♫':'♪';$('soundBtn').style.opacity=soundOn?'1':'.55';if(soundOn)sound(600,.05)});
 shell.addEventListener('pointerdown',e=>{if(e.target.closest('button')||e.target.closest('.card'))return;if(state==='playing'){e.preventDefault();boost()}},{passive:false});
 window.addEventListener('keydown',e=>{if(['Space','ArrowUp','KeyW'].includes(e.code)){e.preventDefault();if(!e.repeat)action()}else if(e.code==='Escape'){if(state==='playing'||state==='paused')togglePause()}else if(e.code==='KeyR'&&state==='over')start()});
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&state==='playing')togglePause()});
-// Configure the H5 Games Ad Placement API. This is an ad opportunity, not a guarantee of fill.
-try {
-  if (typeof window.adConfig === 'function') {
-    window.adConfig({preloadAdBreaks:'auto', sound:soundOn?'on':'off'});
-  }
-} catch (err) { console.warn('H5 Games Ads initialization issue:', err); }
-
-function requestGameAd(type, done) {
-  if (adInProgress || typeof window.adBreak !== 'function') { done(); return; }
-  adInProgress = true;
-  let completed = false;
-  const finish = () => {
-    if (completed) return;
-    completed = true;
-    adInProgress = false;
-    done();
-  };
-  try {
-    window.adBreak({
-      type: type,
-      name: type === 'start' ? 'rocket_dash_start' : 'rocket_dash_next_run',
-      beforeAd: () => {
-        if (audioCtx && audioCtx.state === 'running') audioCtx.suspend().catch(() => {});
-      },
-      afterAd: () => {
-        if (audioCtx && audioCtx.state === 'suspended' && soundOn) audioCtx.resume().catch(() => {});
-      },
-      adBreakDone: () => finish()
-    });
-  } catch (err) {
-    console.warn('H5 Games ad placement failed:', err);
-    finish();
-  }
-}
-function launchWithAd() {
-  if (!hasStartedOnce) {
-    hasStartedOnce = true;
-    requestGameAd('start', start);
-  } else {
-    start();
-  }
-}
-function restartWithAd() {
-  runsSinceAd++;
-  if (runsSinceAd >= 3) {
-    runsSinceAd = 0;
-    requestGameAd('next', start);
-  } else {
-    start();
-  }
-}
 reset();requestAnimationFrame(frame);
 })();
 </script>
