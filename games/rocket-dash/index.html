@@ -41,7 +41,24 @@ h1{font-size:clamp(36px,9vw,58px);line-height:.95;letter-spacing:-.055em;margin:
 #toast{position:absolute;z-index:4;top:24%;left:50%;transform:translate(-50%,-8px);opacity:0;color:#baf8ff;font-size:12px;font-weight:900;letter-spacing:.16em;text-shadow:0 0 15px #4ae5ff;transition:opacity .18s,transform .18s;pointer-events:none}
 #toast.show{opacity:1;transform:translate(-50%,0)}
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto;transition:none!important}}
+
+.walletline{font-size:12px;font-weight:900;color:#b47a16;margin:7px 0 8px}
+.reward-note{font-size:10px;color:#6d8797;line-height:1.4;margin:7px 0 0;min-height:24px}
+.reward-btn{margin-top:8px;width:100%;border:2px solid #8dcf88;border-radius:13px;padding:11px;background:#efffed;color:#286c42;font-size:11px;font-weight:950;letter-spacing:.02em;cursor:pointer}
+.reward-btn:disabled{opacity:.55;cursor:wait}
+.primary.hidden{display:none!important}
+#overOverlay .card{max-height:92%;overflow-y:auto}
 </style>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2129877342025466" crossorigin="anonymous"></script>
+<script>
+  // Google H5 Games Ads exposes adConfig/adBreak when the site and account are configured.
+  window.adsbygoogle = window.adsbygoogle || [];
+  window.addEventListener('load', function(){
+    if (typeof window.adConfig === 'function') {
+      try { window.adConfig({preloadAdBreaks: 'on'}); } catch (e) {}
+    }
+  });
+</script>
 </head>
 <body>
 <div id="shell" aria-label="Rocket Dash game">
@@ -81,6 +98,10 @@ h1{font-size:clamp(36px,9vw,58px);line-height:.95;letter-spacing:-.055em;margin:
     <h1 style="font-size:38px">FLIGHT<br><span style="color:#ff8b5c">COMPLETE</span></h1>
     <div class="gameover-score" id="finalScore">0</div>
     <div class="bestline" id="resultLine">Distance travelled</div>
+    <div class="walletline" id="walletLine">⭐ Star bank: 0</div>
+    <button class="primary hidden" id="continueBtn">Continue · 25 ⭐</button>
+    <button class="reward-btn" id="watchAdBtn">▶ Watch ad · earn 10 ⭐</button>
+    <div class="reward-note" id="rewardNote">Collect stars during flight. Spend 25 stars to continue once per run, or watch a rewarded ad for 10 stars.</div>
     <button class="primary" id="restartBtn">Fly again&nbsp; ↻</button>
     <button class="secondary" id="homeBtn">MAIN MENU</button>
   </div>
@@ -103,6 +124,8 @@ const $=id=>document.getElementById(id);
 let W=0,H=0,DPR=1, state='ready', last=0, time=0, score=0, stars=0, best=0;
 let rocket={x:0,y:0,vy:0,tilt:0}, gates=[], particles=[], starItems=[], bgStars=[];
 let speed=245, spawnTimer=0, soundOn=true, audioCtx=null, shake=0, flash=0, newBest=false;
+let starBank=0, continueUsed=false, continueInvulnerable=0, adInProgress=false;
+try{starBank=Math.max(0,Number(localStorage.getItem('rocketDashStarBank')||0)||0)}catch(e){}
 try{best=Number(localStorage.getItem('rocketDashBest')||0)||0}catch(e){}
 $('best').textContent=String(best).padStart(3,'0');
 function resize(){
@@ -122,32 +145,36 @@ function sound(freq=440,dur=.07,type='sine',vol=.035){
  o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+dur)}catch(e){}
 }
 function reset(){
- score=0;stars=0;time=0;speed=Math.max(225,W*.36);spawnTimer=.9;gates=[];particles=[];starItems=[];shake=0;flash=0;newBest=false;
+ score=0;stars=0;time=0;continueUsed=false;continueInvulnerable=0;speed=Math.max(210,W*.36);spawnTimer=.9;gates=[];particles=[];starItems=[];shake=0;flash=0;newBest=false;
  rocket={x:W*.25,y:H*.48,vy:0,tilt:0};
  for(let i=0;i<3;i++)spawnGate(W+i*W*.57+120);
  updateHUD();
 }
-function start(){reset();state='playing';$('startOverlay').classList.add('hidden');$('overOverlay').classList.add('hidden');$('pauseOverlay').classList.add('hidden');$('hint').innerHTML='<b>TAP / CLICK</b> to thrust upward<br><span>Watch the gap. Flight speed increases over time.</span>';boost();last=performance.now()}
+function start(){reset();state='playing';$('startOverlay').classList.add('hidden');$('overOverlay').classList.add('hidden');$('pauseOverlay').classList.add('hidden');$('hint').innerHTML='<b>TAP / CLICK</b> to thrust upward<br><span>Watch the gap. The opening gets smaller every 20 seconds. Flight speed stays steady.</span>';boost();last=performance.now()}
 function boost(){if(state!=='playing')return;rocket.vy=-H*.58;sound(520,.055,'triangle',.026);for(let i=0;i<5;i++)particles.push({x:rocket.x-13,y:rocket.y+10,vx:rand(-110,-30),vy:rand(20,95),life:rand(.18,.42),max:.42,size:rand(2,5),color:Math.random()>.4?'#64eaff':'#ffb45d'})}
 function spawnGate(x=W+60){
- const gap=Math.max(142,Math.min(210,H*.25)-Math.max(0,time-12)*1.1);
+ // Difficulty progression changes ONLY the vertical opening. Flight speed and gate cadence stay steady.
+ const baseGap=Math.max(190,Math.min(250,H*.32));
+ const minimumGap=Math.max(145,H*.22);
+ const difficultyLevel=Math.floor(time/20);
+ const gap=Math.max(minimumGap,baseGap-difficultyLevel*8);
  const margin=Math.max(75,H*.13),center=rand(margin+gap/2,H-margin-gap/2);
  const width=Math.max(48,Math.min(68,W*.13));
  gates.push({x,center,gap,width,passed:false,seed:Math.random()*10});
  if(Math.random()<.88)starItems.push({x:x+width+rand(45,90),y:center+rand(-gap*.2,gap*.2),r:10,got:false,phase:Math.random()*6});
 }
 function update(dt){
- time+=dt;speed=Math.min(W*.72, W*.36+time*2.6);rocket.vy+=H*1.18*dt;rocket.y+=rocket.vy*dt;rocket.tilt=Math.max(-.45,Math.min(.9,rocket.vy/(H*.9)));
- spawnTimer-=dt;if(spawnTimer<=0){spawnGate(W+80);spawnTimer=Math.max(.82,1.36-time*.008)}
+ time+=dt;continueInvulnerable=Math.max(0,continueInvulnerable-dt);speed=Math.max(210,W*.36);rocket.vy+=H*1.18*dt;rocket.y+=rocket.vy*dt;rocket.tilt=Math.max(-.45,Math.min(.9,rocket.vy/(H*.9)));
+ spawnTimer-=dt;if(spawnTimer<=0){spawnGate(W+80);spawnTimer=1.36}
  for(const g of gates){g.x-=speed*dt;
   if(!g.passed&&g.x+g.width<rocket.x){g.passed=true;score+=10;burst(rocket.x,rocket.y,'#5ceaff',9);sound(720,.05,'sine',.018)}
-  if(rocket.x+13>g.x&&rocket.x-13<g.x+g.width){
+  if(continueInvulnerable<=0&&rocket.x+13>g.x&&rocket.x-13<g.x+g.width){
    if(rocket.y-12<g.center-g.gap/2||rocket.y+12>g.center+g.gap/2){crash();return}
   }
  }
  gates=gates.filter(g=>g.x+g.width>-20);
  for(const s of starItems){s.x-=speed*dt;s.phase+=dt*4;
-  if(!s.got&&Math.hypot(s.x-rocket.x,s.y-rocket.y)<24){s.got=true;stars++;score+=25;flash=.2;burst(s.x,s.y,'#ffe88b',15);sound(920,.1,'sine',.045);$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),420)}
+  if(!s.got&&Math.hypot(s.x-rocket.x,s.y-rocket.y)<24){s.got=true;stars++;starBank++;try{localStorage.setItem('rocketDashStarBank',String(starBank))}catch(e){}score+=25;flash=.2;burst(s.x,s.y,'#ffe88b',15);sound(920,.1,'sine',.045);$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),420)}
  }
  starItems=starItems.filter(s=>s.x>-30&&!s.got);
  score+=dt*2.2;shake=Math.max(0,shake-dt*22);flash=Math.max(0,flash-dt);
@@ -157,12 +184,12 @@ function update(dt){
  if(rocket.y>H-48||rocket.y<42){crash();return}
  updateHUD();
 }
-function updateHUD(){$('score').textContent=String(Math.floor(score)).padStart(3,'0');$('stars').textContent=stars;$('best').textContent=String(Math.max(best,Math.floor(score))).padStart(3,'0')}
+function updateHUD(){$('score').textContent=String(Math.floor(score)).padStart(3,'0');$('stars').textContent=stars;$('best').textContent=String(Math.max(best,Math.floor(score))).padStart(3,'0');$('walletLine').textContent=`⭐ Star bank: ${starBank}`}
 function burst(x,y,color,n){for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,v=rand(40,220);particles.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:rand(.25,.65),max:.65,size:rand(2,5),color})}}
 function crash(){
  if(state!=='playing')return;state='over';shake=13;flash=.4;sound(130,.22,'sawtooth',.045);burst(rocket.x,rocket.y,'#ff7b92',28);
  const final=Math.floor(score);newBest=final>best;if(newBest){best=final;try{localStorage.setItem('rocketDashBest',String(best))}catch(e){}}
- $('finalScore').textContent=final;$('resultLine').textContent=(newBest?'✦ NEW PERSONAL BEST  ·  ':'')+` ${stars} star${stars===1?'':'s'} collected`; $('resultEyebrow').textContent=newBest?'New record achieved':'Mission ended';updateHUD();
+ $('finalScore').textContent=final;$('resultLine').textContent=(newBest?'✦ NEW PERSONAL BEST  ·  ':'')+` ${stars} star${stars===1?'':'s'} collected`; $('resultEyebrow').textContent=newBest?'New record achieved':'Mission ended';updateHUD();$('continueBtn').classList.toggle('hidden',continueUsed||starBank<25);$('watchAdBtn').disabled=false;$('rewardNote').textContent=continueUsed?'Continue already used this run. Start a new run to play again.':'Spend 25 banked stars to continue, or watch a rewarded ad to earn 10 more.';
  setTimeout(()=>{if(state==='over')$('overOverlay').classList.remove('hidden')},420);
 }
 function drawBackground(){
@@ -254,6 +281,34 @@ function draw(){
 function frame(now){const dt=Math.min(.035,(now-last)/1000||0);last=now;if(state==='playing')update(dt);else if(state==='over'){for(const p of particles){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=120*dt;p.life-=dt}particles=particles.filter(p=>p.life>0);shake=Math.max(0,shake-dt*20);flash=Math.max(0,flash-dt)}draw();requestAnimationFrame(frame)}
 function togglePause(){if(state==='playing'){state='paused';$('pauseOverlay').classList.remove('hidden');$('pauseBtn').textContent='▶'}else if(state==='paused'){state='playing';$('pauseOverlay').classList.add('hidden');$('pauseBtn').textContent='Ⅱ';last=performance.now()}}
 function action(){if(state==='playing')boost();else if(state==='ready')start();else if(state==='over'){start()}else if(state==='paused')togglePause()}
+function continueFlight(){
+ if(state!=='over'||continueUsed||starBank<25)return;
+ starBank-=25;continueUsed=true;continueInvulnerable=2.2;
+ try{localStorage.setItem('rocketDashStarBank',String(starBank))}catch(e){}
+ $('overOverlay').classList.add('hidden');state='playing';
+ // Clear nearby gates so the continue cannot cause an unavoidable collision.
+ gates=gates.filter(g=>g.x>rocket.x+W*.28);starItems=starItems.filter(s=>s.x>rocket.x+W*.2);
+ rocket.y=H*.5;rocket.vy=0;rocket.tilt=0;boost();
+ $('walletLine').textContent=`⭐ Star bank: ${starBank}`;
+ $('hint').innerHTML='<b>CONTINUE!</b> Brief collision protection is active<br><span>Keep flying and collect more stars.</span>';
+ last=performance.now();updateHUD();
+}
+function watchRewardAd(){
+ if(adInProgress)return;
+ if(typeof window.adBreak!=='function'){
+   $('rewardNote').textContent='Rewarded ads are not available. The game must be served from an approved site with Google H5 Games Ads configured.';return;
+ }
+ adInProgress=true;$('watchAdBtn').disabled=true;$('rewardNote').textContent='Loading a rewarded ad…';
+ let rewarded=false;
+ const finish=()=>{adInProgress=false;$('watchAdBtn').disabled=false;};
+ try{window.adBreak({type:'reward',name:'rocket-dash-earn-stars',
+   beforeReward:function(showAdFn){$('rewardNote').textContent='Complete the ad to earn 10 stars.';if(typeof showAdFn==='function')showAdFn();},
+   adViewed:function(){if(rewarded)return;rewarded=true;starBank+=10;try{localStorage.setItem('rocketDashStarBank',String(starBank))}catch(e){}$('walletLine').textContent=`⭐ Star bank: ${starBank}`;$('rewardNote').textContent='Thanks for watching! 10 stars added.';$('continueBtn').classList.toggle('hidden',continueUsed||starBank<25);updateHUD();},
+   adDismissed:function(){$('rewardNote').textContent='Ad closed before completion. No stars awarded.';},
+   adBreakDone:function(info){finish();if(!rewarded&&(!info||info.breakStatus!=='viewed'))$('rewardNote').textContent='No rewarded ad was available. Your stars have not changed.';}
+ });}catch(e){finish();$('rewardNote').textContent='Could not load an ad. Please try again later.';}
+}
+$('continueBtn').addEventListener('click',continueFlight);$('watchAdBtn').addEventListener('click',watchRewardAd);
 $('startBtn').addEventListener('click',start);$('restartBtn').addEventListener('click',start);
 $('homeBtn').addEventListener('click',()=>{state='ready';$('overOverlay').classList.add('hidden');$('startOverlay').classList.remove('hidden');rocket={x:W*.25,y:H*.48,vy:0,tilt:0};gates=[];starItems=[]});
 $('pauseBtn').addEventListener('click',()=>{if(state==='playing'||state==='paused')togglePause()});
