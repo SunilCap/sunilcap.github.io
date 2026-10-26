@@ -1,3 +1,3 @@
 User-agent: *
 Allow: /
-Sitemap: https://Scotcha.github.io/sitemap.xml
+Sitemap: https://sunilcap.github.io/sitemap.xml
