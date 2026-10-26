@@ -47,10 +47,13 @@ h1{font-size:clamp(36px,9vw,58px);line-height:.95;letter-spacing:-.06em;margin:1
 #toast{position:absolute;z-index:4;top:24%;left:50%;transform:translate(-50%,-8px);opacity:0;color:#baf8ff;font-size:12px;font-weight:900;letter-spacing:.16em;text-shadow:0 0 15px #4ae5ff;transition:opacity .18s,transform .18s;pointer-events:none}
 #toast.show{opacity:1;transform:translate(-50%,0)}
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto;transition:none!important}}
+
+#site-home-link{position:absolute;z-index:10;left:10px;bottom:10px;display:inline-flex;align-items:center;gap:6px;padding:9px 12px;border:1px solid rgba(148,174,220,.55);border-radius:999px;background:rgba(5,10,28,.82);color:#f5f8ff;text-decoration:none;font:700 12px/1.2 system-ui,sans-serif;backdrop-filter:blur(8px)}#site-home-link:focus-visible{outline:3px solid #59e7ff;outline-offset:3px}
 </style>
 </head>
 <body>
 <div id="shell" aria-label="Rocket Dash game">
+<a id="site-home-link" href="/" aria-label="Back to the games homepage">← Back to games</a>
 <canvas id="game" aria-label="Rocket Dash playfield"></canvas>
 <div class="hud">
   <div class="top">
