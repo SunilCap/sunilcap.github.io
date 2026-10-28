@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Volleyball Duel - Cartoon Edition | Scotcha</title>
+<link rel="manifest" href="/games/volleyball-duel/manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="64x64" href="/icons/volleyball-duel-favicon-64.png">
+<link rel="apple-touch-icon" href="/icons/volleyball-duel-apple-touch-icon.png">
+<meta name="theme-color" content="#2b1b0e">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Volleyball Duel">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: linear-gradient(#ffd66b, #ff9f43 55%, #ff7b54 100%); display: flex; flex-direction: column; align-items: center; font-family: 'Comic Sans MS', 'Segoe UI', sans-serif; color: #2b1b0e; -webkit-tap-highlight-color: transparent; overscroll-behavior: none; padding-bottom: 16px; }
+  #gameWrap { width: 100%; max-width: 640px; padding: 0 8px; box-sizing: border-box; position: relative; display: flex; flex-direction: column; align-items: center; }
+  #gameWrap:fullscreen, #gameWrap.pseudoFullscreen { max-width: 100vw; width: 100vw; height: 100vh; background: #1a1430; padding: 6px; justify-content: flex-start; }
+  #gameWrap:fullscreen #boardArea, #gameWrap.pseudoFullscreen #boardArea { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; width: 100%; }
+  #gameWrap:fullscreen #touchControls, #gameWrap.pseudoFullscreen #touchControls { flex-shrink: 0; }
+  #gameWrap:fullscreen canvas, #gameWrap.pseudoFullscreen canvas { height: auto; width: 100%; max-width: 100%; max-height: 100%; object-fit: contain; }
+  @media (orientation: landscape) {
+    #gameWrap:fullscreen canvas, #gameWrap.pseudoFullscreen canvas { height: 100%; width: auto; max-width: 100%; }
+  }
+  #gameWrap.pseudoFullscreen { position: fixed; top: 0; left: 0; z-index: 9999; }
+  body.pseudoFsActive { overflow: hidden; }
+  body.pseudoFsActive > *:not(#gameWrap) { display: none; }
+  #gameToolbar { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; width: 100%; padding: 6px 0; }
+  .toolBtn { border: 2px solid #fff8e8; border-radius: 8px; padding: 7px 11px; font-size: 13px; font-weight: bold; cursor: pointer; touch-action: manipulation; color: #fff8e8; white-space: nowrap; }
+  #fsBtn, #exitFsBtn, #installBtn { background: rgba(43,27,14,0.85); }
+  #installBtn { display: none; }
+  #siteHomeBtn {
+    display: inline-flex; align-items: center; justify-content: center;
+    background: rgba(43,27,14,0.92); color: #fff8e8; text-decoration: none;
+    border: 2px solid #fff8e8; border-radius: 8px; padding: 7px 11px;
+    font-size: 13px; font-weight: bold; white-space: nowrap;
+    touch-action: manipulation;
+  }
+  #siteHomeBtn:focus-visible { outline: 3px solid #ffe156; outline-offset: 2px; }
+
+  #restartBtn { background: rgba(255,94,98,0.9); display: none; }
+  #homeBtn { background: rgba(58,168,255,0.9); display: none; }
+  #exitFsBtn { display: none; }
+  #gameWrap.pseudoFullscreen #exitFsBtn { display: inline-block; }
+  #gameWrap.pseudoFullscreen #fsBtn { display: none; }
+  @media (max-width: 480px) { .toolBtn, #siteHomeBtn { font-size: 11px; padding: 5px 8px; } #gameToolbar { gap: 4px; padding: 4px 0; } }
+  @media (max-width: 360px) { .toolBtn { font-size: 10px; padding: 4px 6px; } }
+  #boardArea { position: relative; width: 100%; display: flex; justify-content: center; }
+  #startScreen { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(20, 10, 40, 0.6); display: flex; align-items: center; justify-content: center; z-index: 70; border-radius: 14px; }
+  #startCard { background: #fff8e8; border-radius: 18px; padding: 22px 26px; text-align: center; box-shadow: 0 8px 0 #2b1b0e, 0 8px 24px rgba(0,0,0,0.4); border: 4px solid #2b1b0e; max-width: 92%; max-height: 88vh; overflow-y: auto; }
+  #startCard h3 { margin: 0 0 12px; font-size: 18px; }
+  .cardbrand { margin-top: 12px; font-size: 12px; font-weight: bold; color: #6a5638; }
+  .cardbrand b { color: #e0451f; }
+  #pointPopup { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.85); background: #fff3cf; color: #2b1b0e; padding: 18px 32px; border-radius: 18px; text-align: center; pointer-events: none; opacity: 0; transition: opacity 0.2s, transform 0.2s; z-index: 60; min-width: 220px; border: 4px solid #2b1b0e; box-shadow: 0 6px 0 #2b1b0e; }
+  #pointPopup.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  #pointPopup .ppTitle { font-size: 16px; font-weight: bold; color: #ff5e3a; margin-bottom: 8px; }
+  #pointPopup .ppScore { font-size: 34px; font-weight: bold; letter-spacing: 2px; -webkit-text-stroke: 1px #2b1b0e; }
+  #pointPopup .ppSub { font-size: 12px; color: #6a5638; margin-top: 6px; }
+  #touchControls { display: none; width: 100%; max-width: 640px; justify-content: space-between; gap: clamp(6px, 2vw, 16px); padding: clamp(6px, 1.5vw, 12px) clamp(4px, 1.5vw, 10px); box-sizing: border-box; }
+  .padGroup { display: flex; flex-direction: column; align-items: center; gap: clamp(4px, 1.2vw, 10px); width: 46%; max-width: 280px; flex: 1; }
+  .moveStrip { width: 100%; height: clamp(54px, 16vw, 90px); border-radius: clamp(10px, 3vw, 18px); background: rgba(255,248,232,0.75); border: 3px solid #2b1b0e; display: flex; position: relative; overflow: hidden; box-shadow: 0 4px 0 #2b1b0e; }
+  .moveHalf { flex: 1; display: flex; align-items: center; justify-content: center; font-size: clamp(18px, 5.5vw, 30px); color: #2b1b0e; font-weight: bold; }
+  .moveHalf.pressed { background: rgba(255,154,60,0.55); }
+  .moveDivider { width: 3px; background: #2b1b0e; }
+  .jumpBar { width: 100%; height: clamp(30px, 8vw, 46px); border-radius: clamp(8px, 2vw, 12px); border: 3px solid #2b1b0e; background: #ffe156; font-size: clamp(10px, 3vw, 14px); font-weight: bold; letter-spacing: 1px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 0 #2b1b0e; }
+  .jumpBar.pressed, .jumpBar:active { background: #f6c93b; transform: translateY(2px); box-shadow: 0 2px 0 #2b1b0e; }
+  .smashBtn { width: 100%; height: clamp(30px, 8vw, 46px); border-radius: clamp(8px, 2vw, 12px); border: 3px solid #7a0000; background: #ff5e3a; color: #fff; font-size: clamp(10px, 3vw, 14px); font-weight: bold; letter-spacing: 1px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 0 #7a0000; }
+  .smashBtn.pressed, .smashBtn:active { background: #e0451f; transform: translateY(2px); box-shadow: 0 2px 0 #7a0000; }
+  .padLabel { font-size: clamp(9px, 2.6vw, 11px); color: #fff; font-weight: bold; text-align: center; pointer-events: none; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+  @media (min-width: 760px) { #touchControls { display: none; } }
+  h2 { margin: 10px 0 2px; text-shadow: 2px 2px 0 #2b1b0e; color: #fff8e8; letter-spacing: 1px; }
+  p { margin: 0 0 8px; font-size: 13px; color: #4a2f12; text-align: center; max-width: 600px; padding: 0 10px; }
+  canvas { background: linear-gradient(#bdeaff 0%, #bdeaff 68%, #8fd957 68%, #6fc23f 100%); border: 5px solid #2b1b0e; border-radius: 14px; width: 100%; max-width: 640px; height: auto; touch-action: none; box-shadow: 0 6px 0 #2b1b0e; }
+  #status { margin-top: 8px; font-size: 22px; font-weight: bold; color: #fff8e8; text-shadow: 2px 2px 0 #2b1b0e; }
+  #restartHint { font-size: 13px; color: #4a2f12; min-height: 18px; text-align: center; padding: 0 12px; }
+  .modeBtn { padding: 7px 14px; margin: 3px; border: 3px solid #2b1b0e; border-radius: 10px; background: #fff; cursor: pointer; font-size: 13px; font-weight: bold; box-shadow: 0 3px 0 #2b1b0e; }
+  .modeBtn:active { transform: translateY(2px); box-shadow: 0 1px 0 #2b1b0e; }
+  .modeBtn.active { background: #ffe156; border-color: #c9a300; }
+</style>
+</head>
+<body>
+<h2>🏐 Volleyball Duel — Cartoon Edition</h2>
+<p>P1: A/D move, W jump, S/SPACE hit, F smash &nbsp;|&nbsp; P2: ←/→ move, ↑ jump, ↓ hit, / smash &nbsp;|&nbsp; First touch on your ground = point lost!</p>
+<div id="gameWrap">
+  <div id="gameToolbar">
+    <a id="siteHomeBtn" href="/" aria-label="Back to Scotcha home">← Back to Home</a>
+    <button id="fsBtn" class="toolBtn">⛶ Fullscreen</button>
+    <button id="exitFsBtn" class="toolBtn">✕ Exit Fullscreen</button>
+    <button id="installBtn" class="toolBtn">📲 Install</button>
+    <button id="restartBtn" class="toolBtn">↺ Restart</button>
+    <button id="homeBtn" class="toolBtn">🏠 Home</button>
+  </div>
+  <div id="boardArea">
+    <canvas id="game" width="640" height="400"></canvas>
+    <div id="pointPopup"></div>
+    <div id="startScreen">
+      <div id="startCard">
+        <h3>Choose your match</h3>
+        <div id="modeBar" style="margin-bottom:10px;">
+          <button id="btn2p" class="modeBtn">2P Same Device</button>
+          <button id="btn1p" class="modeBtn">1P vs AI</button>
+        </div>
+        <div id="sideBar" style="margin-bottom:10px; display:none;">
+          <span style="font-size:13px; margin-right:6px; color:#4a2f12;">Play as:</span>
+          <button id="btnLeft" class="modeBtn">Left (Red)</button>
+          <button id="btnRight" class="modeBtn">Right (Blue)</button>
+        </div>
+        <button id="btnStart" class="modeBtn" style="background:#ffe156;border-color:#c9a300;padding:10px 28px;font-size:15px;margin-top:6px;">▶ Start Game</button>
+        <div class="cardbrand">A game by <b>Scotcha</b> · scotcha.in</div>
+      </div>
+    </div>
+  </div>
+  <div id="touchControls">
+    <div class="padGroup" id="padP1">
+      <div class="padLabel">Player 1</div>
+      <div class="jumpBar" id="p1Up">JUMP</div>
+      <div class="moveStrip" id="p1Move">
+        <div class="moveHalf" id="p1Left">◀</div>
+        <div class="moveDivider"></div>
+        <div class="moveHalf" id="p1Right">▶</div>
+      </div>
+      <div class="smashBtn" id="p1Smash">SMASH</div>
+    </div>
+    <div class="padGroup" id="padP2">
+      <div class="padLabel">Player 2</div>
+      <div class="jumpBar" id="p2Up">JUMP</div>
+      <div class="moveStrip" id="p2Move">
+        <div class="moveHalf" id="p2Left">◀</div>
+        <div class="moveDivider"></div>
+        <div class="moveHalf" id="p2Right">▶</div>
+      </div>
+      <div class="smashBtn" id="p2Smash">SMASH</div>
+    </div>
+  </div>
+</div>
+<div id="status">Score: 0 - 0</div>
+<div id="restartHint"></div>
+
+<script>
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+const statusEl = document.getElementById('status');
+const gameWrap = document.getElementById('gameWrap');
+const W = canvas.width, H = canvas.height;
+const GROUND_Y = H - 30;
+const GRAVITY = 0.45;
+const NET_X = W / 2;
+const NET_HEIGHT = 110;
+const NET_TOP = GROUND_Y - NET_HEIGHT;
+
+let score = [0, 0];
+let serveSide = 0;
+let pointPaused = false;
+let gameOver = false;
+let gameStarted = false;
+let appMode = 'local2p';
+let humanSide = 0;
+
+const fsBtn = document.getElementById('fsBtn');
+const exitFsBtn = document.getElementById('exitFsBtn');
+
+function supportsRealFullscreen() {
+  return !!(gameWrap.requestFullscreen || gameWrap.webkitRequestFullscreen || gameWrap.mozRequestFullScreen || gameWrap.msRequestFullscreen);
+}
+function enterPseudoFullscreen() {
+  gameWrap.classList.add('pseudoFullscreen');
+  document.body.classList.add('pseudoFsActive');
+}
+function exitPseudoFullscreen() {
+  gameWrap.classList.remove('pseudoFullscreen');
+  document.body.classList.remove('pseudoFsActive');
+}
+function bindTap(el, handler) {
+  let handled = false;
+  el.addEventListener('touchend', function(e) {
+    e.preventDefault(); e.stopPropagation();
+    handled = true; handler();
+    setTimeout(function(){ handled = false; }, 350);
+  }, { passive: false });
+  el.addEventListener('click', function(e) {
+    e.stopPropagation();
+    if (handled) return;
+    handler();
+  });
+}
+bindTap(fsBtn, async function() {
+  if (supportsRealFullscreen()) {
+    try {
+      const req = gameWrap.requestFullscreen || gameWrap.webkitRequestFullscreen || gameWrap.mozRequestFullScreen || gameWrap.msRequestFullscreen;
+      await req.call(gameWrap);
+      return;
+    } catch (e) {}
+  }
+  enterPseudoFullscreen();
+});
+bindTap(exitFsBtn, function() {
+  if (document.fullscreenElement || document.webkitFullscreenElement) {
+    (document.exitFullscreen ? document.exitFullscreen() : (document.webkitExitFullscreen && document.webkitExitFullscreen()));
+  }
+  exitPseudoFullscreen();
+});
+document.addEventListener('fullscreenchange', function() { if (!document.fullscreenElement) exitPseudoFullscreen(); });
+document.addEventListener('webkitfullscreenchange', function() { if (!document.webkitFullscreenElement) exitPseudoFullscreen(); });
+
+const btn1p = document.getElementById('btn1p');
+const btn2p = document.getElementById('btn2p');
+const sideBar = document.getElementById('sideBar');
+const btnLeft = document.getElementById('btnLeft');
+const btnRight = document.getElementById('btnRight');
+const btnStart = document.getElementById('btnStart');
+const restartBtn = document.getElementById('restartBtn');
+const homeBtn = document.getElementById('homeBtn');
+const startScreen = document.getElementById('startScreen');
+
+btn2p.classList.add('active');
+btnLeft.classList.add('active');
+
+function setMode(mode) {
+  appMode = mode;
+  [btn2p, btn1p].forEach(function(b){ b.classList.remove('active'); });
+  sideBar.style.display = 'none';
+  if (mode === 'local2p') { btn2p.classList.add('active'); }
+  if (mode === 'ai') { btn1p.classList.add('active'); sideBar.style.display = 'block'; }
+  updatePadVisibility();
+}
+btn2p.addEventListener('click', function(){ setMode('local2p'); });
+btn1p.addEventListener('click', function(){ setMode('ai'); });
+btnLeft.addEventListener('click', function(){ humanSide = 0; btnLeft.classList.add('active'); btnRight.classList.remove('active'); updatePadVisibility(); });
+btnRight.addEventListener('click', function(){ humanSide = 1; btnRight.classList.add('active'); btnLeft.classList.remove('active'); updatePadVisibility(); });
+
+function goHome() {
+  gameStarted = false; gameOver = false; pointPaused = false;
+  pointPopup.classList.remove('show');
+  score = [0, 0];
+  statusEl.textContent = 'Score: 0 - 0';
+  restartBtn.style.display = 'none'; homeBtn.style.display = 'none';
+  startScreen.style.display = 'flex';
+  document.getElementById('touchControls').style.display = 'none';
+}
+bindTap(restartBtn, function() { restartMatch(); });
+bindTap(homeBtn, goHome);
+
+btnStart.addEventListener('click', function() {
+  startScreen.style.display = 'none';
+  document.getElementById('touchControls').style.display = 'flex';
+  gameStarted = true;
+  restartBtn.style.display = 'inline-block'; homeBtn.style.display = 'inline-block';
+  updatePadVisibility();
+});
+
+const padP1 = document.getElementById('padP1');
+const padP2 = document.getElementById('padP2');
+
+function updatePadVisibility() {
+  const touchControls = document.getElementById('touchControls');
+  if (appMode === 'local2p') {
+    touchControls.style.justifyContent = 'space-between';
+    padP1.style.display = 'flex'; padP2.style.display = 'flex';
+    padP1.style.width = ''; padP1.style.maxWidth = ''; padP2.style.width = ''; padP2.style.maxWidth = '';
+  } else if (appMode === 'ai') {
+    touchControls.style.justifyContent = 'center';
+    if (humanSide === 0) { padP1.style.display = 'flex'; padP2.style.display = 'none'; padP1.style.width = '92%'; padP1.style.maxWidth = '560px'; }
+    else { padP1.style.display = 'none'; padP2.style.display = 'flex'; padP2.style.width = '92%'; padP2.style.maxWidth = '560px'; }
+  }
+}
+
+function bindHold(el, keyCode) {
+  const press = function(e) { e.preventDefault(); keys[keyCode] = true; el.classList.add('pressed'); };
+  const release = function(e) { e.preventDefault(); keys[keyCode] = false; el.classList.remove('pressed'); };
+  el.addEventListener('touchstart', press, { passive: false });
+  el.addEventListener('touchend', release, { passive: false });
+  el.addEventListener('touchcancel', release, { passive: false });
+  el.addEventListener('mousedown', press);
+  el.addEventListener('mouseup', release);
+  el.addEventListener('mouseleave', release);
+}
+bindHold(document.getElementById('p1Left'), 'KeyA');
+bindHold(document.getElementById('p1Right'), 'KeyD');
+bindHold(document.getElementById('p1Up'), 'KeyW');
+bindHold(document.getElementById('p1Smash'), 'KeyF');
+bindHold(document.getElementById('p2Left'), 'ArrowLeft');
+bindHold(document.getElementById('p2Right'), 'ArrowRight');
+bindHold(document.getElementById('p2Up'), 'ArrowUp');
+bindHold(document.getElementById('p2Smash'), 'Slash');
+updatePadVisibility();
+
+const keys = {};
+window.addEventListener('keydown', function(e){ keys[e.code] = true; });
+window.addEventListener('keyup', function(e){ keys[e.code] = false; });
+
+function makePlayer(x, color, facing) {
+  return { x: x, y: GROUND_Y, vx: 0, vy: 0, w: 40, h: 60, color: color, facing: facing, onGround: true, hitCooldown: 0, autoJumpTimer: Math.floor(Math.random()*40), isFlipping: false, flipProgress: 0 };
+}
+let p1 = makePlayer(140, '#ff5e62', 1);
+let p2 = makePlayer(500, '#3aa8ff', -1);
+let ball = { x: 140, y: GROUND_Y - 130, r: 24, vx: 0, vy: 0, floating: true, floatTime: 0 };
+
+function resetServe(side) {
+  serveSide = side;
+  const x = side === 0 ? 140 : 500;
+  ball.x = x; ball.y = GROUND_Y - 130; ball.vx = 0; ball.vy = 0; ball.floating = true; ball.floatTime = 0;
+}
+resetServe(0);
+
+function updatePlayer(p, left, right, jump, hit, opponent) {
+  const speed = 6;
+  if (keys[left]) { p.vx = -speed; p.facing = -1; }
+  else if (keys[right]) { p.vx = speed; p.facing = 1; }
+  else { p.vx *= 0.7; }
+  if (keys[jump] && p.onGround) { p.vy = -10.5; p.onGround = false; }
+  if (!ball.floating) {
+    p.autoJumpTimer++;
+    if (p.autoJumpTimer > 50 && p.onGround) { p.vy = -10.5; p.onGround = false; p.autoJumpTimer = 0; }
+    if (!p.isFlipping && Math.random() < 0.004) { p.isFlipping = true; p.flipProgress = 0; }
+  } else { p.autoJumpTimer = 0; }
+  if (p.isFlipping) { p.flipProgress += 0.22; if (p.flipProgress >= Math.PI * 2) { p.flipProgress = 0; p.isFlipping = false; } }
+  p.vy += GRAVITY; p.x += p.vx; p.y += p.vy;
+  const minX = p === p1 ? p.w/2 + 5 : NET_X + p.w/2 + 5;
+  const maxX = p === p1 ? NET_X - p.w/2 - 5 : W - p.w/2 - 5;
+  p.x = Math.max(minX, Math.min(maxX, p.x));
+  if (p.y >= GROUND_Y) { p.y = GROUND_Y; p.vy = 0; p.onGround = true; }
+  if (p.hitCooldown > 0) p.hitCooldown--;
+  if (keys[hit] && p.hitCooldown === 0) { tryHit(p); p.hitCooldown = 12; }
+}
+function dist(ax, ay, bx, by) { return Math.hypot(ax - bx, ay - by); }
+function runAI(aiPlayer, leftKey, rightKey, upKey, hitKey) {
+  keys[leftKey] = false; keys[rightKey] = false; keys[upKey] = false; keys[hitKey] = false;
+  aiPlayer.aiRefreshTimer = (aiPlayer.aiRefreshTimer || 0) - 1;
+  if (aiPlayer.aiRefreshTimer <= 0) { aiPlayer.aiTargetX = ball.x + (Math.random() - 0.5) * 30; aiPlayer.aiRefreshTimer = 6 + Math.floor(Math.random() * 6); }
+  const dx = aiPlayer.aiTargetX - aiPlayer.x;
+  if (Math.abs(dx) > 14) { if (dx > 0) keys[rightKey] = true; else keys[leftKey] = true; }
+  const dxBall = ball.x - aiPlayer.x;
+  if (ball.y < aiPlayer.y - 80 && Math.abs(dxBall) < 90 && aiPlayer.onGround) keys[upKey] = true;
+  const headY = aiPlayer.y - aiPlayer.h * 0.65;
+  if (dist(aiPlayer.x, headY, ball.x, ball.y) < 70) keys[hitKey] = true;
+}
+function tryHit(p) {
+  const headY = p.y - p.h * 0.65;
+  const d = dist(p.x, headY, ball.x, ball.y);
+  if (d < 70) {
+    const towardSign = p === p1 ? 1 : -1;
+    const distFromNet = Math.abs(p.x - NET_X);
+    const extraPower = Math.min(distFromNet / 220, 1) * 10;
+    ball.vx = towardSign * (9 + extraPower) + p.vx * 0.3;
+    ball.vy = -8 - extraPower * 0.28 - Math.random() * 1.2;
+    ball.floating = false;
+  }
+}
+function updateBall() {
+  if (ball.floating) {
+    ball.floatTime++;
+    ball.y += Math.sin(ball.floatTime * 0.035) * 0.5;
+    const server = serveSide === 0 ? p1 : p2;
+    const touchY = server.y - server.h * 0.5;
+    if (dist(server.x, touchY, ball.x, ball.y) < server.w * 0.6 + ball.r) tryHit(server);
+    return;
+  }
+  ball.vy += GRAVITY * 0.95; ball.x += ball.vx; ball.y += ball.vy; ball.vx *= 0.995;
+  if (ball.x - ball.r < 0) { ball.x = ball.r; ball.vx *= -0.7; }
+  if (ball.x + ball.r > W) { ball.x = W - ball.r; ball.vx *= -0.7; }
+  if (Math.abs(ball.x - NET_X) < ball.r + 4 && ball.y > NET_TOP) { ball.x = ball.x < NET_X ? NET_X - ball.r - 4 : NET_X + ball.r + 4; ball.vx *= -0.5; }
+  if (ball.y - ball.r < 0) { ball.y = ball.r; ball.vy *= -0.6; }
+  collideWithPlayer(p1, 'KeyF'); collideWithPlayer(p2, 'Slash');
+  if (ball.y + ball.r >= GROUND_Y) { ball.y = GROUND_Y - ball.r; const sideHit = ball.x < NET_X ? 0 : 1; awardPoint(sideHit === 0 ? 1 : 0); }
+  const MAX_BALL_SPEED = 24;
+  const curSpeed = Math.hypot(ball.vx, ball.vy);
+  if (curSpeed > MAX_BALL_SPEED) { const scale = MAX_BALL_SPEED / curSpeed; ball.vx *= scale; ball.vy *= scale; }
+}
+function collideWithPlayer(p, smashKey) {
+  const cx = p.x, cy = p.y - p.h * 0.5;
+  const halfW = p.w * 0.5, halfH = p.h * 0.5;
+  const closestX = Math.max(cx - halfW, Math.min(ball.x, cx + halfW));
+  const closestY = Math.max(cy - halfH, Math.min(ball.y, cy + halfH));
+  const dx = ball.x - closestX, dy = ball.y - closestY;
+  const distSq = dx*dx + dy*dy;
+  if (distSq < ball.r * ball.r) {
+    const d = Math.sqrt(distSq) || 0.01;
+    const nx = dx / d, ny = dy / d;
+    const overlap = ball.r - d;
+    ball.x += nx * overlap; ball.y += ny * overlap;
+    const towardSign = p === p1 ? 1 : -1;
+    const distFromNet = Math.abs(p.x - NET_X);
+    const extraPower = Math.min(distFromNet / 220, 1) * 10;
+    const isSmash = smashKey && keys[smashKey];
+    if (isSmash) { ball.vx = towardSign * (16 + extraPower * 0.6) + p.vx * 0.3; ball.vy = 3 + Math.random() * 1.5; spawnSmashEffect(ball.x, ball.y); }
+    else { ball.vx = towardSign * (9 + extraPower) + p.vx * 0.3; ball.vy = -8 - extraPower * 0.28 - Math.abs(p.vy) * 0.15; }
+    ball.floating = false;
+  }
+}
+let smashEffects = [];
+function spawnSmashEffect(x, y) { smashEffects.push({ x: x, y: y, life: 24 }); }
+function updateAndDrawSmashEffects() {
+  smashEffects = smashEffects.filter(function(fx){ return fx.life > 0; });
+  for (let i = 0; i < smashEffects.length; i++) {
+    const fx = smashEffects[i];
+    const t = fx.life / 24;
+    ctx.save();
+    ctx.globalAlpha = t;
+    ctx.translate(fx.x, fx.y - (24 - fx.life) * 1.2);
+    ctx.rotate(-0.08);
+    ctx.font = 'bold 24px Comic Sans MS, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#ff3b3b'; ctx.strokeStyle = '#fff8e8'; ctx.lineWidth = 4;
+    ctx.strokeText('SMASH!', 0, 0);
+    ctx.fillStyle = '#ffcc00';
+    ctx.fillText('SMASH!', 0, 0);
+    ctx.restore();
+    fx.life--;
+  }
+}
+const pointPopup = document.getElementById('pointPopup');
+const WINNING_SCORE = 10;
+function awardPoint(side) {
+  if (pointPaused || gameOver) return;
+  score[side]++;
+  statusEl.textContent = 'Score: ' + score[0] + ' - ' + score[1];
+  pointPaused = true;
+  const matchWon = score[side] >= WINNING_SCORE;
+  const sideName = side === 0 ? 'Left' : 'Right';
+  if (matchWon) {
+    gameOver = true;
+    pointPopup.innerHTML = '<div class="ppTitle">🏆 ' + sideName + ' Player Wins the Match!</div><div class="ppScore">' + score[0] + ' - ' + score[1] + '</div><div class="ppSub">Tap anywhere to play again</div>';
+    pointPopup.classList.add('show');
+  } else {
+    pointPopup.innerHTML = '<div class="ppTitle">Point: ' + sideName + '</div><div class="ppScore">' + score[0] + ' - ' + score[1] + '</div><div class="ppSub">First to ' + WINNING_SCORE + ' wins</div>';
+    pointPopup.classList.add('show');
+    const nextServer = side === 0 ? 1 : 0;
+    setTimeout(function(){ pointPopup.classList.remove('show'); resetServe(nextServer); pointPaused = false; }, 1400);
+  }
+}
+function restartMatch() {
+  score = [0, 0];
+  statusEl.textContent = 'Score: ' + score[0] + ' - ' + score[1];
+  pointPopup.classList.remove('show');
+  gameOver = false; pointPaused = false;
+  p1.x = 140; p1.y = GROUND_Y; p1.vx = 0; p1.vy = 0;
+  p2.x = 500; p2.y = GROUND_Y; p2.vx = 0; p2.vy = 0;
+  resetServe(0);
+}
+canvas.addEventListener('click', function(){ if (gameOver) restartMatch(); });
+canvas.addEventListener('touchstart', function(e){ if (gameOver) { e.preventDefault(); restartMatch(); } }, { passive: false });
+
+let cloudOffset = 0;
+function drawBackgroundExtras() {
+  cloudOffset = (cloudOffset + 0.15) % (W + 200);
+  ctx.save();
+  ctx.translate(70, 55);
+  ctx.fillStyle = '#fff1a8'; ctx.strokeStyle = '#2b1b0e'; ctx.lineWidth = 3;
+  for (let i = 0; i < 8; i++) {
+    ctx.save();
+    ctx.rotate(i * Math.PI / 4 + 0.2);
+    ctx.beginPath();
+    ctx.moveTo(0, -26); ctx.lineTo(6, -38); ctx.lineTo(-6, -38);
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.restore();
+  }
+  ctx.beginPath(); ctx.arc(0, 0, 24, 0, Math.PI * 2); ctx.fillStyle = '#ffe066'; ctx.fill(); ctx.stroke();
+  ctx.restore();
+  function cloud(x, y, s) {
+    ctx.save();
+    ctx.translate(x, y); ctx.scale(s, s);
+    ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#2b1b0e'; ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.arc(0, 0, 14, Math.PI * 0.5, Math.PI * 1.5);
+    ctx.arc(10, -10, 12, Math.PI, Math.PI * 1.85);
+    ctx.arc(24, -6, 14, Math.PI * 1.3, Math.PI * 0.55);
+    ctx.arc(10, 6, 10, 0, Math.PI * 0.5);
+    ctx.closePath();
+    ctx.fill(); ctx.stroke();
+    ctx.restore();
+  }
+  let cx1 = (W + 100 - cloudOffset) % (W + 200) - 100;
+  let cx2 = (W + 280 - cloudOffset) % (W + 200) - 100;
+  cloud(cx1, 40, 1.1); cloud(cx2, 70, 0.8);
+  ctx.fillStyle = '#6fc23f'; ctx.strokeStyle = '#2b1b0e'; ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(0, GROUND_Y + 6);
+  for (let x = 0; x <= W; x += 18) { ctx.arc(x + 9, GROUND_Y + 6, 9, Math.PI, 0, true); }
+  ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.closePath(); ctx.fill(); ctx.stroke();
+}
+function drawNet() {
+  ctx.fillStyle = '#d6d6d6'; ctx.strokeStyle = '#2b1b0e'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.roundRect(NET_X - 6, NET_TOP - 8, 12, NET_HEIGHT + 8, 4); ctx.fill(); ctx.stroke();
+  ctx.strokeStyle = 'rgba(43,27,14,0.55)'; ctx.lineWidth = 1.5;
+  for (let y = NET_TOP; y < GROUND_Y; y += 9) { ctx.beginPath(); ctx.moveTo(NET_X - 18, y); ctx.lineTo(NET_X + 18, y); ctx.stroke(); }
+  for (let x = -18; x <= 18; x += 9) { ctx.beginPath(); ctx.moveTo(NET_X + x, NET_TOP); ctx.lineTo(NET_X + x, GROUND_Y); ctx.stroke(); }
+  ctx.fillStyle = '#ff5e3a';
+  ctx.fillRect(NET_X - 20, NET_TOP - 4, 40, 8);
+  ctx.strokeRect(NET_X - 20, NET_TOP - 4, 40, 8);
+}
+// Scotcha brand badge, drawn on the canvas so it scales with the game and shows in recordings.
+function drawBrand() {
+  const x = 10, y = H - 25, h = 19, t = 'scotcha.in';
+  ctx.save();
+  ctx.font = 'bold 11px Comic Sans MS, Segoe UI, sans-serif';
+  const w = ctx.measureText(t).width + h + 10;
+  ctx.fillStyle = 'rgba(255,248,232,0.88)'; ctx.strokeStyle = '#2b1b0e'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.roundRect(x, y, w, h, h / 2); ctx.fill(); ctx.stroke();
+  ctx.beginPath(); ctx.arc(x + h / 2, y + h / 2, h / 2 - 3, 0, Math.PI * 2); ctx.fillStyle = '#ff9a3c'; ctx.fill();
+  ctx.textBaseline = 'middle'; ctx.textAlign = 'center'; ctx.fillStyle = '#fff'; ctx.font = 'bold 10px sans-serif';
+  ctx.fillText('S', x + h / 2, y + h / 2 + 1);
+  ctx.textAlign = 'left'; ctx.fillStyle = '#2b1b0e'; ctx.font = 'bold 11px Comic Sans MS, Segoe UI, sans-serif';
+  ctx.fillText(t, x + h + 3, y + h / 2 + 1);
+  ctx.restore();
+}
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+  drawBackgroundExtras();
+  drawNet();
+  drawPlayer(p1); drawPlayer(p2); drawBall();
+  updateAndDrawSmashEffects();
+  drawBrand();
+}
+function drawPlayer(p) {
+  ctx.save();
+  ctx.translate(p.x, p.y);
+  if (p.isFlipping) { ctx.translate(0, -p.h / 2); ctx.rotate(p.flipProgress); ctx.translate(0, p.h / 2); }
+  ctx.lineJoin = 'round'; ctx.strokeStyle = '#2b1b0e'; ctx.lineWidth = 3.5;
+  ctx.fillStyle = '#fff8e8';
+  ctx.beginPath(); ctx.ellipse(-10, -2, 9, 6, 0, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+  ctx.beginPath(); ctx.ellipse(10, -2, 9, 6, 0, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = p.color;
+  ctx.beginPath(); ctx.roundRect(-p.w/2, -p.h, p.w, p.h - 6, 14); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = 'rgba(255,255,255,0.85)';
+  ctx.fillRect(-p.w/2 + 2, -p.h*0.45, p.w - 4, 8);
+  ctx.strokeRect(-p.w/2 + 2, -p.h*0.45, p.w - 4, 8);
+  ctx.fillStyle = p.color;
+  ctx.beginPath(); ctx.ellipse(-p.w/2 - 4, -p.h*0.65, 7, 10, 0.3, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+  ctx.beginPath(); ctx.ellipse(p.w/2 + 4, -p.h*0.65, 7, 10, -0.3, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = '#fff8e8';
+  ctx.beginPath(); ctx.arc(-p.w/2 - 4, -p.h*0.65 + 8, 6, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+  ctx.beginPath(); ctx.arc(p.w/2 + 4, -p.h*0.65 + 8, 6, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = '#ffd9a0';
+  ctx.beginPath(); ctx.arc(0, -p.h - 10, 14, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = '#fff';
+  ctx.beginPath(); ctx.arc(p.facing*4 - 2, -p.h - 12, 4.2, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+  ctx.beginPath(); ctx.arc(p.facing*4 + 6, -p.h - 12, 4.2, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = '#2b1b0e';
+  ctx.beginPath(); ctx.arc(p.facing*4 - 2 + p.facing*1.3, -p.h - 12, 2, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(p.facing*4 + 6 + p.facing*1.3, -p.h - 12, 2, 0, Math.PI*2); ctx.fill();
+  ctx.strokeStyle = '#2b1b0e'; ctx.lineWidth = 2.5;
+  ctx.beginPath(); ctx.moveTo(p.facing*4 - 6, -p.h - 18); ctx.lineTo(p.facing*4 + 1, -p.h - 16); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(p.facing*4 + 3, -p.h - 16); ctx.lineTo(p.facing*4 + 10, -p.h - 18); ctx.stroke();
+  ctx.strokeStyle = '#2b1b0e'; ctx.fillStyle = p.color;
+  ctx.beginPath(); ctx.rect(-14, -p.h - 20, 28, 6); ctx.fill(); ctx.stroke();
+  ctx.restore();
+}
+function drawBall() {
+  ctx.save();
+  ctx.translate(ball.x, ball.y);
+  ctx.rotate((ball.x + ball.y) * 0.02);
+  ctx.beginPath(); ctx.arc(0, 0, ball.r, 0, Math.PI * 2);
+  ctx.fillStyle = '#fff8e8'; ctx.strokeStyle = '#2b1b0e'; ctx.lineWidth = 3;
+  ctx.fill(); ctx.stroke();
+  ctx.lineWidth = 2.5;
+  ctx.beginPath(); ctx.arc(0, 0, ball.r, 0.25, Math.PI - 0.25); ctx.stroke();
+  ctx.beginPath(); ctx.arc(0, 0, ball.r, Math.PI + 0.25, Math.PI*2 - 0.25); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(-ball.r*0.95, 2); ctx.quadraticCurveTo(0, ball.r*0.5, ball.r*0.95, 2); ctx.stroke();
+  ctx.fillStyle = '#ff5e3a';
+  ctx.beginPath(); ctx.moveTo(0,0); ctx.arc(0,0,ball.r,0.25,1.0); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#3aa8ff';
+  ctx.beginPath(); ctx.moveTo(0,0); ctx.arc(0,0,ball.r,Math.PI+0.6,Math.PI+1.3); ctx.closePath(); ctx.fill();
+  ctx.restore();
+}
+function loop(ts) {
+  if (!gameStarted || gameOver) { draw(); requestAnimationFrame(loop); return; }
+  if (appMode === 'ai') {
+    if (humanSide === 0) {
+      updatePlayer(p1, 'KeyA', 'KeyD', 'KeyW', 'KeyS', p2);
+      runAI(p2, 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown');
+      updatePlayer(p2, 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', p1);
+    } else {
+      runAI(p1, 'KeyA', 'KeyD', 'KeyW', 'KeyS');
+      updatePlayer(p1, 'KeyA', 'KeyD', 'KeyW', 'KeyS', p2);
+      updatePlayer(p2, 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', p1);
+    }
+    if (keys['Space'] && p1.hitCooldown === 0) { tryHit(p1); p1.hitCooldown = 12; }
+    updateBall();
+  } else {
+    updatePlayer(p1, 'KeyA', 'KeyD', 'KeyW', 'KeyS', p2);
+    updatePlayer(p2, 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', p1);
+    if (keys['Space'] && p1.hitCooldown === 0) { tryHit(p1); p1.hitCooldown = 12; }
+    updateBall();
+  }
+  draw();
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+// Shared Scotcha service worker (offline + install). It lives at the site root.
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/sw.js').catch(function(){});
+  });
+}
+
+// Install button: Android and desktop Chrome show a prompt, iPhone shows how to add it manually.
+(function() {
+  const ib = document.getElementById('installBtn'), hint = document.getElementById('restartHint');
+  const standalone = matchMedia('(display-mode: standalone)').matches || matchMedia('(display-mode: fullscreen)').matches || navigator.standalone === true;
+  if (standalone) return;
+  const ios = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  let deferred = null;
+  if (ios) ib.style.display = 'inline-block';
+  window.addEventListener('beforeinstallprompt', function(e) { e.preventDefault(); deferred = e; ib.style.display = 'inline-block'; });
+  window.addEventListener('appinstalled', function() { ib.style.display = 'none'; hint.textContent = ''; });
+  bindTap(ib, async function() {
+    if (deferred) { deferred.prompt(); try { await deferred.userChoice; } catch (e) {} deferred = null; ib.style.display = 'none'; }
+    else { hint.textContent = 'On iPhone or iPad: tap Share, then “Add to Home Screen”. It opens full screen like an app.'; }
+  });
+})();
+</script>
+</body>
+</html>
