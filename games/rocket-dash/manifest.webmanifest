@@ -1,0 +1,35 @@
+{
+  "name": "Rocket Dash — Scotcha",
+  "short_name": "Rocket Dash",
+  "description": "A one-tap arcade game: dodge gates, grab stars and beat your best distance.",
+  "id": "/games/rocket-dash/",
+  "start_url": "/games/rocket-dash/",
+  "scope": "/games/rocket-dash/",
+  "display": "fullscreen",
+  "display_override": [
+    "fullscreen",
+    "standalone"
+  ],
+  "background_color": "#8fdcff",
+  "theme_color": "#8fdcff",
+  "icons": [
+    {
+      "src": "/icons/rocket-dash-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/rocket-dash-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/rocket-dash-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

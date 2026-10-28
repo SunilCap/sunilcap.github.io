@@ -1,0 +1,35 @@
+{
+  "name": "Word Tower — Scotcha",
+  "short_name": "Word Tower",
+  "description": "Build a colorful tower of words. Last player standing wins.",
+  "id": "/games/word-tower/",
+  "start_url": "/games/word-tower/",
+  "scope": "/games/word-tower/",
+  "display": "fullscreen",
+  "display_override": [
+    "fullscreen",
+    "standalone"
+  ],
+  "background_color": "#139df0",
+  "theme_color": "#0876ce",
+  "icons": [
+    {
+      "src": "/icons/word-tower-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/word-tower-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/word-tower-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
