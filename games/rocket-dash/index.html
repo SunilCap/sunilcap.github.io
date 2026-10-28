@@ -2,6 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="64x64" href="/icons/favicon-64.png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Scotcha">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#8fdcff">
 <meta name="description" content="Rocket Dash — a one-tap HTML5 arcade game. Dodge gates, grab stars and power-ups, and beat your best distance.">
@@ -63,6 +70,7 @@ h1{font-size:clamp(38px,9vw,56px);line-height:.95;margin:10px 0;color:#263a54;te
     <div class="brand">One-tap arcade<b>Rocket Dash</b></div>
     <div style="display:flex;gap:7px;pointer-events:auto;align-items:center">
       <a class="iconbtn" id="backHomeBtn" href="/" aria-label="Back to Scotcha home" title="Back to home" style="font-size:22px">⌂</a>
+      <button class="iconbtn" id="fsBtn" aria-label="Full screen" title="Full screen">⛶</button>
       <button class="iconbtn" id="soundBtn" aria-label="Toggle sound" title="Toggle sound">♫</button>
       <button class="iconbtn" id="pauseBtn" aria-label="Pause game" title="Pause">Ⅱ</button>
     </div>
@@ -86,6 +94,8 @@ h1{font-size:clamp(38px,9vw,56px);line-height:.95;margin:10px 0;color:#263a54;te
     <div class="tips"><span>🛡️ Shield</span><span>🧲 Magnet</span><span>⭐ Combo</span></div>
     <button class="primary" id="startBtn">Launch mission ↗</button>
     <a class="secondary" href="/" aria-label="Back to Scotcha home">⌂ Back to home</a>
+    <button class="secondary hidden" id="installBtn">📲 Install · play full screen</button>
+    <div id="installHint" class="hidden" style="font-size:13px;color:#60788b;font-weight:700;margin-top:8px;line-height:1.4"></div>
     <div class="controls"><span><i class="key">Tap</i>thrust</span><span><i class="key">Space</i>desktop</span></div>
   </div>
 </div>
@@ -96,9 +106,9 @@ h1{font-size:clamp(38px,9vw,56px);line-height:.95;margin:10px 0;color:#263a54;te
     <div class="gameover-score" id="finalScore">0</div>
     <div class="bestline" id="resultLine">Distance travelled</div>
     <div class="walletline" id="walletLine">⭐ Star bank: 0</div>
-    <button class="primary hidden" id="continueBtn">Continue · 25 ⭐</button>
+    <button class="primary hidden" id="continueBtn">Continue · 25 ⭐ (0 left)</button>
     <button class="reward-btn" id="watchAdBtn">▶ Watch ad · earn 10 ⭐</button>
-    <div class="reward-note" id="rewardNote">Collect stars during flight. Spend 25 stars to continue once per run, or watch a rewarded ad for 10 stars.</div>
+    <div class="reward-note" id="rewardNote">Collect stars during flight. Spend 25 stars to continue as many times as your bank allows, or watch a rewarded ad for 10 stars.</div>
     <button class="primary" id="restartBtn">Fly again ↻</button>
     <button class="secondary" id="homeBtn">Main menu</button>
     <a class="secondary" href="/" aria-label="Back to Scotcha home">⌂ Back to home</a>
@@ -126,7 +136,7 @@ let W=0,H=0,DPR=1,state='ready',last=0,time=0,score=0,stars=0,best=0,scroll=0;
 let rocket={x:0,y:0,vy:0,tilt:0},gates=[],particles=[],starItems=[],powers=[],floats=[],bgStars=[],clouds=[];
 let speed=245,spawnT=0,trailT=0,soundOn=true,audioCtx=null,shake=0,flash=0,newBest=false,streak=0;
 let shield=false,magnet=0,inv=0,countT=0,countBoost=true,lastCount=0,nightness=0;
-let starBank=0,continueUsed=false,adInProgress=false;
+let starBank=0,adInProgress=false;
 try{starBank=Math.max(0,Number(localStorage.getItem('rocketDashStarBank')||0)||0)}catch(e){}
 try{best=Number(localStorage.getItem('rocketDashBest')||0)||0}catch(e){}
 $('best').textContent=String(best).padStart(3,'0');
@@ -146,7 +156,7 @@ function sound(f=440,d=.07,t='sine',v=.035){
 }
 function say(t,x,y,c='#fff'){floats.push({txt:t,x,y,c,life:1})}
 function reset(){
- score=0;stars=0;time=0;scroll=0;streak=0;shield=false;magnet=0;inv=0;continueUsed=false;speed=base();spawnT=.9;trailT=0;
+ score=0;stars=0;time=0;scroll=0;streak=0;shield=false;magnet=0;inv=0;speed=base();spawnT=.9;trailT=0;
  gates=[];particles=[];starItems=[];powers=[];floats=[];shake=0;flash=0;newBest=false;
  rocket={x:W*.25,y:H*.48,vy:0,tilt:0};
  for(let i=0;i<3;i++)spawnGate(W+i*base()*1.36+120);
@@ -211,14 +221,15 @@ function update(dt){
  if(rocket.y>H-48||rocket.y<42){if(inv>0||shield){const dn=rocket.y>H/2;rocket.y=dn?H-48:42;rocket.vy=dn?-H*.5:0;hit()}else{crash();return}}
  hud();
 }
+function contUI(){const n=Math.floor(starBank/25);$('continueBtn').classList.toggle('hidden',n<1);$('continueBtn').textContent=`Continue · 25 ⭐ (${n} left)`}
 function buffs(){$('buffs').textContent=(shield?'🛡️ ':'')+(magnet>0?`🧲 ${Math.ceil(magnet)}s`:'')}
 function hud(){$('score').textContent=String(Math.floor(score)).padStart(3,'0');$('stars').textContent=stars;$('best').textContent=String(Math.max(best,Math.floor(score))).padStart(3,'0');$('walletLine').textContent=`⭐ Star bank: ${starBank}`;if(state==='playing')buffs()}
 function crash(){
  if(state!=='playing')return;state='over';shell.classList.remove('is-playing');shake=REDUCE?0:13;flash=.4;sound(130,.22,'sawtooth',.045);burst(rocket.x,rocket.y,'#ff7b92',28);burst(rocket.x,rocket.y,'#fff',12);
  const fin=Math.floor(score);newBest=fin>best;if(newBest){best=fin;try{localStorage.setItem('rocketDashBest',String(best))}catch(e){}}
  $('finalScore').textContent=fin;$('resultLine').textContent=(newBest?'✦ New personal best · ':'')+`${stars} star${stars===1?'':'s'} collected`;$('resultEyebrow').textContent=newBest?'New record!':'Mission ended';
- hud();$('continueBtn').classList.toggle('hidden',continueUsed||starBank<25);$('watchAdBtn').disabled=false;
- $('rewardNote').textContent=continueUsed?'Continue already used this run. Start a new run to play again.':'Spend 25 banked stars to continue, or watch a rewarded ad to earn 10 more.';
+ hud();contUI();$('watchAdBtn').disabled=false;
+ $('rewardNote').textContent=starBank>=25?'Spend 25 stars to keep flying. Continue as many times as your star bank allows.':'Not enough stars to continue. Watch a rewarded ad to earn 10 more, or fly again.';
  setTimeout(()=>{if(state==='over')$('overOverlay').classList.remove('hidden')},420);
 }
 function drawBackground(){
@@ -305,8 +316,8 @@ function togglePause(){
 }
 function action(){if(state==='playing')boost();else if(state==='ready'||state==='over')start();else if(state==='paused')togglePause()}
 function continueFlight(){
- if(state!=='over'||continueUsed||starBank<25)return;
- starBank-=25;continueUsed=true;inv=2.4;streak=0;try{localStorage.setItem('rocketDashStarBank',String(starBank))}catch(e){}
+ if(state!=='over'||starBank<25)return;
+ starBank-=25;inv=2.4;streak=0;try{localStorage.setItem('rocketDashStarBank',String(starBank))}catch(e){}
  $('overOverlay').classList.add('hidden');shell.classList.add('is-playing');
  gates=gates.filter(g=>g.x>rocket.x+W*.28);starItems=starItems.filter(s=>s.x>rocket.x+W*.2);powers=powers.filter(p=>p.x>rocket.x+W*.2);
  rocket.y=H*.5;rocket.vy=0;rocket.tilt=0;particles=[];beginCount(2,false);
@@ -319,7 +330,7 @@ function watchRewardAd(){
  let rewarded=false;const finish=()=>{adInProgress=false;$('watchAdBtn').disabled=false};
  try{window.adBreak({type:'reward',name:'rocket-dash-earn-stars',
   beforeReward:function(showAdFn){$('rewardNote').textContent='Complete the ad to earn 10 stars.';if(typeof showAdFn==='function')showAdFn()},
-  adViewed:function(){if(rewarded)return;rewarded=true;starBank+=10;try{localStorage.setItem('rocketDashStarBank',String(starBank))}catch(e){}$('rewardNote').textContent='Thanks for watching! 10 stars added.';$('continueBtn').classList.toggle('hidden',continueUsed||starBank<25);hud()},
+  adViewed:function(){if(rewarded)return;rewarded=true;starBank+=10;try{localStorage.setItem('rocketDashStarBank',String(starBank))}catch(e){}$('rewardNote').textContent='Thanks for watching! 10 stars added.';contUI();hud();if(starBank>=25)$('rewardNote').textContent='Thanks for watching! 10 stars added. You can continue now.'},
   adDismissed:function(){$('rewardNote').textContent='Ad closed before completion. No stars awarded.'},
   adBreakDone:function(info){finish();if(!rewarded&&(!info||info.breakStatus!=='viewed'))$('rewardNote').textContent='No rewarded ad was available. Your stars have not changed.'}
  })}catch(e){finish();$('rewardNote').textContent='Could not load an ad. Please try again later.'}
@@ -333,6 +344,36 @@ shell.addEventListener('pointerdown',e=>{if(e.target.closest('button,.card,a'))r
 addEventListener('keydown',e=>{if(['Space','ArrowUp','KeyW'].includes(e.code)){e.preventDefault();if(!e.repeat)action()}else if(e.code==='Escape'||e.code==='KeyP'){if(state==='playing'||state==='paused')togglePause()}else if(e.code==='KeyR'&&state==='over')start()});
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&state==='playing')togglePause()});
 reset();requestAnimationFrame(frame);
+})();
+</script>
+<script>
+// Full screen + "install as app" support
+(()=>{
+const TITLE='Rocket Dash',BG='#8fdcff',EMOJI='🚀',$=id=>document.getElementById(id);
+const standalone=matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches||navigator.standalone===true;
+// Offline + install support
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));
+// Full screen button
+const de=document.documentElement,req=de.requestFullscreen||de.webkitRequestFullscreen,exit=document.exitFullscreen||document.webkitExitFullscreen,fs=$('fsBtn');
+const isFS=()=>!!(document.fullscreenElement||document.webkitFullscreenElement);
+if(fs){
+ if(!req||standalone)fs.classList.add('hidden');
+ fs.onclick=()=>{try{isFS()?exit.call(document):req.call(de)}catch(e){}};
+ const sync=()=>{fs.textContent=isFS()?'⤡':'⛶';fs.title=isFS()?'Exit full screen':'Full screen'};
+ document.addEventListener('fullscreenchange',sync);document.addEventListener('webkitfullscreenchange',sync);
+}
+// Install button
+const ib=$('installBtn'),hint=$('installHint'),ios=/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+let deferred=null;
+if(ib&&!standalone){
+ if(ios)ib.classList.remove('hidden');
+ addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e;ib.classList.remove('hidden')});
+ addEventListener('appinstalled',()=>{ib.classList.add('hidden');hint.classList.add('hidden')});
+ ib.onclick=async()=>{
+  if(deferred){deferred.prompt();try{await deferred.userChoice}catch(e){}deferred=null;ib.classList.add('hidden')}
+  else{hint.textContent='On iPhone or iPad: tap the Share button, then “Add to Home Screen”. It will open full screen like an app.';hint.classList.remove('hidden')}
+ };
+}
 })();
 </script>
 </body>

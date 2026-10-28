@@ -1,5 +1,12 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0876ce"><title>Word Tower | Scotcha</title>
+<html lang="en"><head><meta charset="utf-8">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="64x64" href="/icons/favicon-64.png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Scotcha">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0876ce"><title>Word Tower | Scotcha</title>
 <style>
 :root{--ink:#102b50;--wood:#ffbd59;--woodd:#b77837}
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#071b3d;font-family:"Baloo 2","Fredoka","Trebuchet MS",system-ui,sans-serif;color:#fff}
@@ -15,7 +22,7 @@ button,input,select{font:inherit}button{cursor:pointer;touch-action:manipulation
 .hill{position:absolute;bottom:0;left:-10%;width:120%;height:24%;border-radius:50% 50% 0 0;background:#58c35a}.hill:after{content:"";position:absolute;left:35%;top:18%;width:100%;height:100%;border-radius:50% 50% 0 0;background:#a5e65c}
 .pillar{position:absolute;bottom:7%;width:62px;height:40%;background:linear-gradient(90deg,#b9854a,#f0ce8b 38%,#cda166 75%,#93673d);border:4px solid #e6bf7a;border-radius:6px 6px 0 0}.pillar:before{content:"";position:absolute;top:-14px;left:-9px;right:-9px;height:18px;background:#f0cf91;border:4px solid #c79a5d;border-radius:6px}
 .pillar.l{left:-14px}.pillar.r{right:-14px;height:34%}.flag{position:absolute;top:22%;left:9px;width:34px;height:76px;background:#e73f42;clip-path:polygon(0 0,100% 0,100% 100%,50% 80%,0 100%);transform-origin:top;animation:wave 3s ease-in-out infinite}.r .flag{left:auto;right:9px;animation-delay:-1.5s}@keyframes wave{50%{transform:skewX(5deg) scaleY(.96)}}
-header{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;padding:calc(10px + env(safe-area-inset-top)) 10px 6px}
+header{display:grid;grid-template-columns:auto 1fr auto auto;gap:8px;align-items:center;padding:calc(10px + env(safe-area-inset-top)) 10px 6px}
 .pill{border:0;border-radius:14px;background:linear-gradient(#0b69c4,#06468e);color:#fff;font-weight:800;padding:9px 13px;min-height:42px;box-shadow:0 4px #063d79,inset 0 1px #fff4;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;font-size:16px}
 .pill:active{transform:translateY(3px);box-shadow:0 1px #063d79}#round{justify-self:center;min-width:120px}
 #players{display:grid;grid-template-columns:repeat(auto-fit,minmax(70px,1fr));gap:6px;padding:4px 10px 6px}
@@ -61,7 +68,7 @@ label{display:block;font-size:13px;font-weight:800;color:#17395e;margin-top:8px;
 </style></head>
 <body><main id="g">
 <div class="scene"><div class="sun"></div><div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div><div class="mtn"></div><div class="hill"></div><div class="pillar l"><div class="flag"></div></div><div class="pillar r"><div class="flag"></div></div></div>
-<header><a class="pill" href="https://scotcha.in/">⌂ Home</a><div class="pill" id="round">Round 1</div><button class="pill" id="snd" aria-label="Sound on or off">🔊</button></header>
+<header><a class="pill" href="https://scotcha.in/">⌂ Home</a><div class="pill" id="round">Round 1</div><button class="pill" id="snd" aria-label="Sound on or off">🔊</button><button class="pill" id="fsBtn" aria-label="Full screen" title="Full screen">⛶</button></header>
 <section id="players" aria-label="Players"></section>
 <section class="content">
 <div id="win"><div id="tower"></div></div>
@@ -75,7 +82,7 @@ label{display:block;font-size:13px;font-weight:800;color:#17395e;margin-top:8px;
 <div class="row"><label>Players<select id="num"><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option><option>7</option><option>8</option></select></label><label>Mode<select id="mode"><option value="local">Pass and play</option><option value="bots">Play vs bots</option></select></label></div>
 <div class="row"><label>Seconds per turn<input id="secsIn" type="number" min="5" max="60" value="15" inputmode="numeric"></label><label id="lvlW" class="hidden">Bot skill<select id="lvl"><option value="easy">Easy</option><option value="normal" selected>Normal</option><option value="hard">Hard</option></select></label></div>
 <label>Player names</label><div class="names" id="names"></div>
-<button class="big g" id="start">Start game</button><button class="big b" id="how">How to play</button><p class="small" id="best"></p></section>
+<button class="big g" id="start">Start game</button><button class="big b" id="how">How to play</button><button class="big b hidden" id="installBtn">📲 Install · play full screen</button><div id="installHint" class="hidden" style="font-size:13px;color:#60788b;font-weight:700;margin-top:8px;line-height:1.4"></div><p class="small" id="best"></p></section>
 <section class="card hidden" id="help"><h2>How to play</h2><ol class="how"><li>The first word starts with A.</li><li>Every next word starts with the last letter of the previous word.</li><li>Longer words score more points: one point per letter.</li><li>A word that isn’t in the dictionary or has the wrong first letter can be retried before time runs out.</li><li>Run out of time and you’re out.</li><li>Last player standing wins.</li></ol><p class="small">Words are checked against a built-in list, then two online dictionaries. If you’re offline, the game trusts your word.</p><button class="big b" id="back">Back</button></section>
 <section class="card hidden" id="end"><div style="font-size:64px;animation:bob 1.6s infinite">🏆</div><h2 id="win2" style="margin:4px 0"></h2><p class="sub" id="endmsg"></p><ul class="rank" id="rank"></ul><button class="big g" id="again">Play again</button><button class="big b" id="menuBtn">Change settings</button></section>
 </div>
@@ -123,4 +130,34 @@ $('start').onclick=start;$('again').onclick=start;$('how').onclick=()=>show('hel
 $('snd').onclick=()=>{mute=!mute;$('snd').textContent=mute?'🔇':'🔊'};
 logo();names();updBest();show('menu');
 })();
-</script></body></html>
+</script><script>
+// Full screen + "install as app" support
+(()=>{
+const TITLE='Word Tower',BG='#0876ce',EMOJI='🧱',$=id=>document.getElementById(id);
+const standalone=matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches||navigator.standalone===true;
+// Offline + install support
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));
+// Full screen button
+const de=document.documentElement,req=de.requestFullscreen||de.webkitRequestFullscreen,exit=document.exitFullscreen||document.webkitExitFullscreen,fs=$('fsBtn');
+const isFS=()=>!!(document.fullscreenElement||document.webkitFullscreenElement);
+if(fs){
+ if(!req||standalone)fs.classList.add('hidden');
+ fs.onclick=()=>{try{isFS()?exit.call(document):req.call(de)}catch(e){}};
+ const sync=()=>{fs.textContent=isFS()?'⤡':'⛶';fs.title=isFS()?'Exit full screen':'Full screen'};
+ document.addEventListener('fullscreenchange',sync);document.addEventListener('webkitfullscreenchange',sync);
+}
+// Install button
+const ib=$('installBtn'),hint=$('installHint'),ios=/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+let deferred=null;
+if(ib&&!standalone){
+ if(ios)ib.classList.remove('hidden');
+ addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e;ib.classList.remove('hidden')});
+ addEventListener('appinstalled',()=>{ib.classList.add('hidden');hint.classList.add('hidden')});
+ ib.onclick=async()=>{
+  if(deferred){deferred.prompt();try{await deferred.userChoice}catch(e){}deferred=null;ib.classList.add('hidden')}
+  else{hint.textContent='On iPhone or iPad: tap the Share button, then “Add to Home Screen”. It will open full screen like an app.';hint.classList.remove('hidden')}
+ };
+}
+})();
+</script>
+</body></html>
