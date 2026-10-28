@@ -24,13 +24,17 @@ button,input,select{font:inherit}button{cursor:pointer;touch-action:manipulation
 .pillar.l{left:-14px}.pillar.r{right:-14px;height:34%}.flag{position:absolute;top:22%;left:9px;width:34px;height:76px;background:#e73f42;clip-path:polygon(0 0,100% 0,100% 100%,50% 80%,0 100%);transform-origin:top;animation:wave 3s ease-in-out infinite}.r .flag{left:auto;right:9px;animation-delay:-1.5s}@keyframes wave{50%{transform:skewX(5deg) scaleY(.96)}}
 header{display:grid;grid-template-columns:auto 1fr auto auto;gap:8px;align-items:center;padding:calc(10px + env(safe-area-inset-top)) 10px 6px}
 .pill{border:0;border-radius:14px;background:linear-gradient(#0b69c4,#06468e);color:#fff;font-weight:800;padding:9px 13px;min-height:42px;box-shadow:0 4px #063d79,inset 0 1px #fff4;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;font-size:16px}
-.pill:active{transform:translateY(3px);box-shadow:0 1px #063d79}#round{justify-self:center;min-width:120px}
+.pill:active{transform:translateY(3px);box-shadow:0 1px #063d79}
+.sbrand{display:inline-flex;align-items:center;gap:6px;padding:3px 11px 3px 4px;border-radius:999px;background:#ffffffc7;border:2px solid #fff;box-shadow:0 2px #305e7a22;color:#26344a;font-weight:800;font-size:12px;letter-spacing:.2px;pointer-events:none;white-space:nowrap}
+.sbrand i{font-style:normal;display:grid;place-items:center;width:20px;height:20px;border-radius:50%;background:linear-gradient(#ffd34d,#ff9a3c);color:#fff;font-weight:900;font-size:12px;text-shadow:0 1px #b8621c88}
+.cardbrand{margin-top:14px;font-size:13px;font-weight:700;color:#678296}.cardbrand b{color:#e48b32}
+.sfoot{text-align:center;margin-top:-2px}#round{justify-self:center;min-width:120px}
 #players{display:grid;grid-template-columns:repeat(auto-fit,minmax(70px,1fr));gap:6px;padding:4px 10px 6px}
 .pl{position:relative;border:3px solid #fffb;border-radius:14px;padding:5px 2px;text-align:center;color:#fff;font-weight:800;font-size:clamp(12px,3.2vw,15px);box-shadow:0 4px #0a2a4a30,inset 0 1px #fff6;text-shadow:0 1px #0003;transition:transform .25s,filter .4s,opacity .4s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pl b{display:block;font-size:1.3em;line-height:1.1}.pl.on{outline:3px solid #ffe75d;outline-offset:1px;transform:translateY(-3px) scale(1.05);animation:glow 1s ease-in-out infinite}.pl.out{filter:grayscale(1);opacity:.45}.pl.out:after{content:"✕";position:absolute;top:-2px;right:5px;color:#ff3b3b;font-size:20px;text-shadow:0 1px #fff}
 .pl.lead:before{content:"👑";position:absolute;top:-4px;left:3px;font-size:14px}@keyframes glow{50%{box-shadow:0 4px #0a2a4a30,0 0 16px #ffe75d}}
 .content{flex:1;min-height:0;display:flex;flex-direction:column;gap:8px;padding:0 11px calc(12px + env(safe-area-inset-bottom));position:relative}
-#win{flex:1;min-height:180px;max-height:calc(100dvh - 330px);overflow:hidden;display:flex;align-items:flex-end;justify-content:center;position:relative}
+#win{flex:1;min-height:180px;max-height:calc(100dvh - 362px);overflow:hidden;display:flex;align-items:flex-end;justify-content:center;position:relative}
 #win:after{content:"";position:absolute;left:6%;right:6%;bottom:0;height:16px;background:linear-gradient(#d9ae70,#a97b46);border:3px solid #8b6038;border-radius:8px;box-shadow:0 5px #5d3e27}
 #tower{width:min(100%,470px);display:flex;flex-direction:column;align-items:center;gap:6px;padding:0 6px 20px;transition:transform .6s cubic-bezier(.2,.8,.2,1)}
 #tower.hit{animation:hit .4s}@keyframes hit{25%{margin-left:-5px}60%{margin-left:5px}}
@@ -63,7 +67,7 @@ label{display:block;font-size:13px;font-weight:800;color:#17395e;margin-top:8px;
 .rank{list-style:none;margin:8px 0;padding:0;text-align:left}.rank li{display:flex;align-items:center;gap:10px;padding:7px 10px;margin:5px 0;border-radius:12px;background:#fff;font-weight:800;border-left:8px solid var(--c);animation:card .5s both;animation-delay:calc(var(--i)*.1s)}.rank span{margin-left:auto}
 #conf{position:absolute;inset:0;z-index:7;pointer-events:none;width:100%;height:100%}
 :focus-visible{outline:3px solid #ffe75d;outline-offset:2px}
-@media(max-height:680px){#win{max-height:calc(100dvh - 285px)}.ring{width:52px;height:52px}.ring span{font-size:20px}#req{height:36px}}
+@media(max-height:680px){#win{max-height:calc(100dvh - 318px)}.ring{width:52px;height:52px}.ring span{font-size:20px}#req{height:36px}}
 @media(prefers-reduced-motion:reduce){*{animation-duration:.01s!important;animation-iteration-count:1!important;transition-duration:.01s!important}}
 </style></head>
 <body><main id="g">
@@ -75,6 +79,7 @@ label{display:block;font-size:13px;font-weight:800;color:#17395e;margin-top:8px;
 <div class="prompt"><div class="sign">Make a word starting with<br><span id="req">A</span></div><div class="ring" id="ring"><svg viewBox="0 0 44 44"><circle class="bg" cx="22" cy="22" r="19"/><circle id="arc" cx="22" cy="22" r="19"/></svg><span id="secs">15</span></div></div>
 <div id="status" aria-live="polite"></div>
 <form id="form" autocomplete="off"><input id="word" maxlength="18" placeholder="Enter your word…" aria-label="Your word" autocapitalize="characters" spellcheck="false" disabled><button class="go" id="submit" disabled>Submit</button></form>
+<div class="sfoot"><span class="sbrand"><i>S</i>scotcha.in</span></div>
 <div id="banner"></div>
 </section>
 <div class="ov" id="ov">
@@ -82,9 +87,9 @@ label{display:block;font-size:13px;font-weight:800;color:#17395e;margin-top:8px;
 <div class="row"><label>Players<select id="num"><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option><option>7</option><option>8</option></select></label><label>Mode<select id="mode"><option value="local">Pass and play</option><option value="bots">Play vs bots</option></select></label></div>
 <div class="row"><label>Seconds per turn<input id="secsIn" type="number" min="5" max="60" value="15" inputmode="numeric"></label><label id="lvlW" class="hidden">Bot skill<select id="lvl"><option value="easy">Easy</option><option value="normal" selected>Normal</option><option value="hard">Hard</option></select></label></div>
 <label>Player names</label><div class="names" id="names"></div>
-<button class="big g" id="start">Start game</button><button class="big b" id="how">How to play</button><button class="big b hidden" id="installBtn">📲 Install · play full screen</button><div id="installHint" class="hidden" style="font-size:13px;color:#60788b;font-weight:700;margin-top:8px;line-height:1.4"></div><p class="small" id="best"></p></section>
+<button class="big g" id="start">Start game</button><button class="big b" id="how">How to play</button><button class="big b hidden" id="installBtn">📲 Install · play full screen</button><div id="installHint" class="hidden" style="font-size:13px;color:#60788b;font-weight:700;margin-top:8px;line-height:1.4"></div><p class="small" id="best"></p><div class="cardbrand">A game by <b>Scotcha</b> · scotcha.in</div></section>
 <section class="card hidden" id="help"><h2>How to play</h2><ol class="how"><li>The first word starts with A.</li><li>Every next word starts with the last letter of the previous word.</li><li>Longer words score more points: one point per letter.</li><li>A word that isn’t in the dictionary or has the wrong first letter can be retried before time runs out.</li><li>Run out of time and you’re out.</li><li>Last player standing wins.</li></ol><p class="small">Words are checked against a built-in list, then two online dictionaries. If you’re offline, the game trusts your word.</p><button class="big b" id="back">Back</button></section>
-<section class="card hidden" id="end"><div style="font-size:64px;animation:bob 1.6s infinite">🏆</div><h2 id="win2" style="margin:4px 0"></h2><p class="sub" id="endmsg"></p><ul class="rank" id="rank"></ul><button class="big g" id="again">Play again</button><button class="big b" id="menuBtn">Change settings</button></section>
+<section class="card hidden" id="end"><div style="font-size:64px;animation:bob 1.6s infinite">🏆</div><h2 id="win2" style="margin:4px 0"></h2><p class="sub" id="endmsg"></p><ul class="rank" id="rank"></ul><button class="big g" id="again">Play again</button><button class="big b" id="menuBtn">Change settings</button><div class="cardbrand">A game by <b>Scotcha</b> · scotcha.in</div></section>
 </div>
 <canvas id="conf"></canvas>
 </main>

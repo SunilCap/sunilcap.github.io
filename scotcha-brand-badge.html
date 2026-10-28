@@ -1,0 +1,11 @@
+<!-- Scotcha brand badge: paste into any game so viewers know where it's from. -->
+<!-- 1) CSS: put inside <style> -->
+<style>
+.sbrand{display:inline-flex;align-items:center;gap:6px;padding:3px 11px 3px 4px;border-radius:999px;background:#ffffffc7;border:2px solid #fff;box-shadow:0 2px #305e7a22;color:#26344a;font:800 12px/1.2 system-ui,sans-serif;letter-spacing:.2px;pointer-events:none;white-space:nowrap}
+.sbrand i{font-style:normal;display:grid;place-items:center;width:20px;height:20px;border-radius:50%;background:linear-gradient(#ffd34d,#ff9a3c);color:#fff;font-weight:900;font-size:12px;text-shadow:0 1px #b8621c88}
+/* Place it in a free corner of the play area, for example bottom-left: */
+.sbrand.corner{position:absolute;left:14px;bottom:14px;z-index:3}
+</style>
+
+<!-- 2) HTML: put inside the game's main container (the one with position:relative) -->
+<div class="sbrand corner" aria-hidden="true"><i>S</i>scotcha.in</div>

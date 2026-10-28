@@ -23,13 +23,20 @@ canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 .top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
 .brand{font-size:clamp(11px,2vw,14px);color:#365e7b;font-weight:800}.brand b{display:block;color:#243a56;font-size:clamp(20px,4vw,28px);margin-top:1px}
 .pill{border:2px solid #fff;background:#ffffffdb;border-radius:16px;padding:6px 12px;min-width:84px;text-align:right;box-shadow:0 3px #305e7a20}
-.pill small,.stat small{display:block;font-size:11px;color:#54728a;font-weight:800}.pill strong{display:block;font-size:clamp(20px,4vw,26px);line-height:1.1;font-variant-numeric:tabular-nums}
-.stats{display:flex;gap:8px;justify-content:center;margin-top:clamp(14px,4vh,40px)}
-.stat{min-width:104px;text-align:center;padding:5px 16px;background:#ffffffd1;border:2px solid #fff;border-radius:16px;box-shadow:0 4px #305e7a20}.stat strong{display:block;font-size:clamp(22px,4.5vw,28px);line-height:1.1;font-variant-numeric:tabular-nums}
-#buffs{text-align:center;min-height:30px;margin-top:8px;font-size:18px;font-weight:800;color:#243a56;text-shadow:0 1px #fff}
+.pill small{display:block;font-size:12px;color:#54728a;font-weight:800}.pill strong{display:block;font-size:clamp(20px,4vw,26px);line-height:1.1;font-variant-numeric:tabular-nums}
+.topleft{display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.chip{display:none;gap:12px;align-items:center;padding:3px 12px;border-radius:14px;background:#ffffffb8;border:2px solid #fff;box-shadow:0 3px #305e7a1f;font-size:clamp(16px,3.8vw,20px);font-weight:800;line-height:1.3;font-variant-numeric:tabular-nums}
+.is-playing .chip{display:flex}
+.bl{display:flex;flex-direction:column;align-items:flex-start;gap:8px}
+#buffs{min-height:24px;font-size:16px;font-weight:800;color:#243a56;text-shadow:0 1px #fff}
 .bottom{margin-top:auto;display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
 .hint{font-size:13px;line-height:1.4;color:#315b77;text-shadow:0 1px #fff6}.hint b{color:#243a56}
 .iconbtn{pointer-events:auto;border:2px solid #fff;background:#fff;color:#36536c;border-radius:14px;width:44px;height:44px;font-size:17px;cursor:pointer;box-shadow:0 3px #305e7a20;display:grid;place-items:center;text-decoration:none;font-weight:900}.iconbtn:active{transform:translateY(2px)}
+.is-playing .iconbtn{opacity:.85;width:40px;height:40px}
+.is-playing .pill{opacity:.8;transform:scale(.85);transform-origin:bottom right}
+.sbrand{display:inline-flex;align-items:center;gap:6px;padding:3px 11px 3px 4px;border-radius:999px;background:#ffffffc7;border:2px solid #fff;box-shadow:0 2px #305e7a22;color:#26344a;font-weight:800;font-size:12px;letter-spacing:.2px;pointer-events:none;white-space:nowrap}
+.sbrand i{font-style:normal;display:grid;place-items:center;width:20px;height:20px;border-radius:50%;background:linear-gradient(#ffd34d,#ff9a3c);color:#fff;font-weight:900;font-size:12px;text-shadow:0 1px #b8621c88}
+.cardbrand{margin-top:14px;font-size:13px;font-weight:700;color:#678296}.cardbrand b{color:#e48b32}
 .overlay{position:absolute;z-index:5;inset:0;display:grid;place-items:center;padding:20px;background:#3675972e;overflow-y:auto}
 .card{width:min(100%,370px);padding:clamp(20px,5vw,30px);border-radius:28px;text-align:center;background:#fffdf4;border:3px solid #fff;box-shadow:0 7px #37688333,0 18px 45px #264d6529;animation:in .45s cubic-bezier(.3,1.4,.5,1)}
 @keyframes in{from{transform:translateY(24px) scale(.9);opacity:0}}
@@ -67,7 +74,7 @@ h1{font-size:clamp(38px,9vw,56px);line-height:.95;margin:10px 0;color:#263a54;te
 <canvas id="game" aria-label="Rocket Dash playfield"></canvas>
 <div class="hud">
   <div class="top">
-    <div class="brand">One-tap arcade<b>Rocket Dash</b></div>
+    <div class="topleft"><div class="brand">One-tap arcade<b>Rocket Dash</b></div><div class="chip" aria-label="Distance and stars"><span>🚀 <span id="score">000</span></span><span>⭐ <span id="stars">0</span></span></div><div id="buffs" aria-live="polite"></div></div>
     <div style="display:flex;gap:7px;pointer-events:auto;align-items:center">
       <a class="iconbtn" id="backHomeBtn" href="/" aria-label="Back to Scotcha home" title="Back to home" style="font-size:22px">⌂</a>
       <button class="iconbtn" id="fsBtn" aria-label="Full screen" title="Full screen">⛶</button>
@@ -75,13 +82,8 @@ h1{font-size:clamp(38px,9vw,56px);line-height:.95;margin:10px 0;color:#263a54;te
       <button class="iconbtn" id="pauseBtn" aria-label="Pause game" title="Pause">Ⅱ</button>
     </div>
   </div>
-  <div class="stats">
-    <div class="stat"><small>Distance</small><strong id="score">000</strong></div>
-    <div class="stat"><small>Stars</small><strong id="stars">0</strong></div>
-  </div>
-  <div id="buffs" aria-live="polite"></div>
   <div class="bottom">
-    <div class="hint" id="hint"><b>Tap or click</b> to thrust upward<br><span>Thread the gates. Grab stars. Don’t crash.</span></div>
+    <div class="bl"><div class="hint" id="hint"><b>Tap or click</b> to thrust upward<br><span>Thread the gates. Grab stars. Don’t crash.</span></div><div class="sbrand" aria-hidden="true"><i>S</i>scotcha.in</div></div>
     <div class="pill"><small>Best run</small><strong id="best">000</strong></div>
   </div>
 </div>
@@ -97,6 +99,7 @@ h1{font-size:clamp(38px,9vw,56px);line-height:.95;margin:10px 0;color:#263a54;te
     <button class="secondary hidden" id="installBtn">📲 Install · play full screen</button>
     <div id="installHint" class="hidden" style="font-size:13px;color:#60788b;font-weight:700;margin-top:8px;line-height:1.4"></div>
     <div class="controls"><span><i class="key">Tap</i>thrust</span><span><i class="key">Space</i>desktop</span></div>
+    <div class="cardbrand">A game by <b>Scotcha</b> · scotcha.in</div>
   </div>
 </div>
 <div class="overlay hidden" id="overOverlay">
@@ -112,6 +115,7 @@ h1{font-size:clamp(38px,9vw,56px);line-height:.95;margin:10px 0;color:#263a54;te
     <button class="primary" id="restartBtn">Fly again ↻</button>
     <button class="secondary" id="homeBtn">Main menu</button>
     <a class="secondary" href="/" aria-label="Back to Scotcha home">⌂ Back to home</a>
+    <div class="cardbrand">A game by <b>Scotcha</b> · scotcha.in</div>
   </div>
 </div>
 <div class="overlay hidden" id="pauseOverlay">

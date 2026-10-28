@@ -1,6 +1,6 @@
 // Scotcha service worker: makes games installable and playable offline.
 // Bump VERSION whenever you want every player to refresh their cached copy.
-const VERSION = 'scotcha-v2';
+const VERSION = 'scotcha-v3';
 
 // Pages and files to save for offline play. Add the URL of every game here.
 // A URL that doesn't exist is skipped, so it's safe to list games before they're live.
