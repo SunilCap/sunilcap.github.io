@@ -60,12 +60,12 @@ h1{font-size:clamp(38px,9vw,56px);line-height:.95;margin:10px 0;color:#263a54;te
 </style>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2129877342025466" crossorigin="anonymous"></script>
 <script>
-  // Required Google H5 Games Ads Ad Placement API queue/initialization.
+  // Google's documented H5 Games Ads Ad Placement API initialization.
   window.adsbygoogle = window.adsbygoogle || [];
-  var adBreak = window.adBreak = window.adConfig = function(o) {
-    window.adsbygoogle.push(o);
+  var adBreak = adConfig = function(o) {
+    adsbygoogle.push(o);
   };
-  // Request preloading before the first ad placement.
+  // Preload ads before the first placement.
   adConfig({preloadAdBreaks: 'on'});
 </script>
 </head>
@@ -344,9 +344,12 @@ function showGameOverWithInterstitial(){
   window.adBreak({type:'next',name:'rocket-dash-game-over-interstitial',
    beforeAd:function(){/* Game state is already over; no gameplay continues behind the ad. */},
    afterAd:function(){/* Resume the game-over screen after the interstitial closes. */},
-   adBreakDone:function(){finish()}
+   adBreakDone:function(info){
+    console.info('[H5 Ads] Rocket Dash interstitial completed:', info && info.breakStatus ? info.breakStatus : 'status unavailable', info || '');
+    finish();
+   }
   });
- }catch(e){finish()}
+ }catch(e){console.error('[H5 Ads] Rocket Dash interstitial failed:',e);finish()}
 }
 function watchRewardAd(){
  if(adInProgress)return;
@@ -357,8 +360,11 @@ function watchRewardAd(){
   beforeReward:function(showAdFn){$('rewardNote').textContent='Complete the ad to earn 10 stars.';if(typeof showAdFn==='function')showAdFn()},
   adViewed:function(){if(rewarded)return;rewarded=true;starBank+=10;try{localStorage.setItem('rocketDashStarBank',String(starBank))}catch(e){}$('rewardNote').textContent='Thanks for watching! 10 stars added.';contUI();hud();if(starBank>=25)$('rewardNote').textContent='Thanks for watching! 10 stars added. You can continue now.'},
   adDismissed:function(){$('rewardNote').textContent='Ad closed before completion. No stars awarded.'},
-  adBreakDone:function(info){finish();if(!rewarded&&(!info||info.breakStatus!=='viewed'))$('rewardNote').textContent='No rewarded ad was available. Your stars have not changed.'}
- })}catch(e){finish();$('rewardNote').textContent='Could not load an ad. Please try again later.'}
+  adBreakDone:function(info){
+   console.info('[H5 Ads] Rocket Dash rewarded placement completed:', info && info.breakStatus ? info.breakStatus : 'status unavailable', info || '');
+   finish();if(!rewarded&&(!info||info.breakStatus!=='viewed'))$('rewardNote').textContent='No rewarded ad was available. Your stars have not changed.'
+  }
+ })}catch(e){console.error('[H5 Ads] Rocket Dash rewarded placement failed:',e);finish();$('rewardNote').textContent='Could not load an ad. Please try again later.'}
 }
 $('continueBtn').onclick=continueFlight;$('watchAdBtn').onclick=watchRewardAd;$('startBtn').onclick=start;$('restartBtn').onclick=start;
 $('homeBtn').onclick=()=>{state='ready';shell.classList.remove('is-playing');$('overOverlay').classList.add('hidden');$('startOverlay').classList.remove('hidden');rocket={x:W*.25,y:H*.48,vy:0,tilt:0};gates=[];starItems=[];powers=[];floats=[];$('buffs').textContent=''};
