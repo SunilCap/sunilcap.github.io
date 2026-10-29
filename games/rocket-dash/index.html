@@ -60,13 +60,13 @@ h1{font-size:clamp(38px,9vw,56px);line-height:.95;margin:10px 0;color:#263a54;te
 </style>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2129877342025466" crossorigin="anonymous"></script>
 <script>
-  // Google H5 Games Ads exposes adConfig/adBreak when the site and account are configured.
+  // Required Google H5 Games Ads Ad Placement API queue/initialization.
   window.adsbygoogle = window.adsbygoogle || [];
-  window.addEventListener('load', function(){
-    if (typeof window.adConfig === 'function') {
-      try { window.adConfig({preloadAdBreaks: 'on'}); } catch (e) {}
-    }
-  });
+  var adBreak = window.adBreak = window.adConfig = function(o) {
+    window.adsbygoogle.push(o);
+  };
+  // Request preloading before the first ad placement.
+  adConfig({preloadAdBreaks: 'on'});
 </script>
 </head>
 <body>
