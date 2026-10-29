@@ -141,6 +141,9 @@ let rocket={x:0,y:0,vy:0,tilt:0},gates=[],particles=[],starItems=[],powers=[],fl
 let speed=245,spawnT=0,trailT=0,soundOn=true,audioCtx=null,shake=0,flash=0,newBest=false,streak=0;
 let shield=false,magnet=0,inv=0,countT=0,countBoost=true,lastCount=0,nightness=0;
 let starBank=0,adInProgress=false;
+// Ad-only frequency cap: attempt one interstitial after every 3 completed runs.
+let completedRunsForAds=0;
+try{completedRunsForAds=Math.max(0,Number(localStorage.getItem('rocketDashCompletedRunsForAds')||0)||0)}catch(e){}
 try{starBank=Math.max(0,Number(localStorage.getItem('rocketDashStarBank')||0)||0)}catch(e){}
 try{best=Number(localStorage.getItem('rocketDashBest')||0)||0}catch(e){}
 $('best').textContent=String(best).padStart(3,'0');
@@ -234,7 +237,7 @@ function crash(){
  $('finalScore').textContent=fin;$('resultLine').textContent=(newBest?'✦ New personal best · ':'')+`${stars} star${stars===1?'':'s'} collected`;$('resultEyebrow').textContent=newBest?'New record!':'Mission ended';
  hud();contUI();$('watchAdBtn').disabled=false;
  $('rewardNote').textContent=starBank>=25?'Spend 25 stars to keep flying. Continue as many times as your star bank allows.':'Not enough stars to continue. Watch a rewarded ad to earn 10 more, or fly again.';
- setTimeout(()=>{if(state==='over')$('overOverlay').classList.remove('hidden')},420);
+ setTimeout(()=>{if(state==='over')showGameOverWithInterstitial()},420);
 }
 function drawBackground(){
  const k=(time/32)%3,i=Math.floor(k),n=(i+1)%3,t=ease(k-i);
@@ -326,6 +329,24 @@ function continueFlight(){
  gates=gates.filter(g=>g.x>rocket.x+W*.28);starItems=starItems.filter(s=>s.x>rocket.x+W*.2);powers=powers.filter(p=>p.x>rocket.x+W*.2);
  rocket.y=H*.5;rocket.vy=0;rocket.tilt=0;particles=[];beginCount(2,false);
  $('hint').innerHTML='<b>Continue!</b> Brief protection is active<br><span>Keep flying and collect more stars.</span>';hud();
+}
+// Interstitial placement at the natural game-over transition. The game-over UI is
+// always revealed, including when the API is unavailable or no ad is filled.
+function showGameOverWithInterstitial(){
+ if(state!=='over')return;
+ completedRunsForAds++;
+ try{localStorage.setItem('rocketDashCompletedRunsForAds',String(completedRunsForAds))}catch(e){}
+ const showGameOver=()=>{if(state==='over')$('overOverlay').classList.remove('hidden')};
+ if(completedRunsForAds%3!==0||typeof window.adBreak!=='function'){showGameOver();return}
+ let completed=false;
+ const finish=()=>{if(completed)return;completed=true;showGameOver()};
+ try{
+  window.adBreak({type:'next',name:'rocket-dash-game-over-interstitial',
+   beforeAd:function(){/* Game state is already over; no gameplay continues behind the ad. */},
+   afterAd:function(){/* Resume the game-over screen after the interstitial closes. */},
+   adBreakDone:function(){finish()}
+  });
+ }catch(e){finish()}
 }
 function watchRewardAd(){
  if(adInProgress)return;
