@@ -58,15 +58,13 @@ h1{font-size:clamp(38px,9vw,56px);line-height:.95;margin:10px 0;color:#263a54;te
 :focus-visible{outline:3px solid #ff8b5c;outline-offset:2px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2129877342025466" crossorigin="anonymous"></script>
+<!-- Google H5 Games Ads. Both scripts are required: the second one creates adBreak() and adConfig(). -->
+<!-- To test with fake ads, temporarily add data-adbreak-test="on" to the first script. Remove it before going live. -->
+<script async data-ad-client="ca-pub-2129877342025466" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2129877342025466" crossorigin="anonymous"></script>
 <script>
-  // Google's documented H5 Games Ads Ad Placement API initialization.
-  window.adsbygoogle = window.adsbygoogle || [];
-  var adBreak = adConfig = function(o) {
-    adsbygoogle.push(o);
-  };
-  // Preload ads before the first placement.
-  adConfig({preloadAdBreaks: 'on'});
+window.adsbygoogle = window.adsbygoogle || [];
+var adBreak = adConfig = function(o) { adsbygoogle.push(o); };
+adConfig({ preloadAdBreaks: 'on', sound: 'on' });
 </script>
 </head>
 <body>
@@ -141,13 +139,28 @@ let rocket={x:0,y:0,vy:0,tilt:0},gates=[],particles=[],starItems=[],powers=[],fl
 let speed=245,spawnT=0,trailT=0,soundOn=true,audioCtx=null,shake=0,flash=0,newBest=false,streak=0;
 let shield=false,magnet=0,inv=0,countT=0,countBoost=true,lastCount=0,nightness=0;
 let starBank=0,adInProgress=false;
-// Ad-only frequency cap: attempt one interstitial after every 3 completed runs.
-let completedRunsForAds=0;
-try{completedRunsForAds=Math.max(0,Number(localStorage.getItem('rocketDashCompletedRunsForAds')||0)||0)}catch(e){}
 try{starBank=Math.max(0,Number(localStorage.getItem('rocketDashStarBank')||0)||0)}catch(e){}
 try{best=Number(localStorage.getItem('rocketDashBest')||0)||0}catch(e){}
 $('best').textContent=String(best).padStart(3,'0');
 const base=()=>Math.max(210,W*.36);
+// Interstitial ad at a natural break (play again). Google decides whether an ad really shows; the game always continues.
+let adBusy = false, adLast = 0;
+function showAd(next) {
+  if (adBusy) return;
+  if (typeof adBreak !== 'function' || Date.now() - adLast < 45000) { next(); return; }
+  adBusy = true; let shown = false, done = false, saved;
+  const fin = function() { if (done) return; done = true; adBusy = false; next(); };
+  try {
+    adBreak({
+      type: 'next', name: 'play-again',
+      beforeAd: function() { shown = true; saved = soundOn; soundOn = false; },
+      afterAd: function() { soundOn = saved; adLast = Date.now(); },
+      adBreakDone: fin
+    });
+    // If ads are blocked or slow, never leave the player waiting.
+    setTimeout(function() { if (!shown) fin(); }, 3000);
+  } catch (e) { fin(); }
+}
 function resize(){
  const r=shell.getBoundingClientRect();DPR=Math.min(devicePixelRatio||1,2);W=r.width;H=r.height;
  cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);ctx.setTransform(DPR,0,0,DPR,0,0);
@@ -237,7 +250,7 @@ function crash(){
  $('finalScore').textContent=fin;$('resultLine').textContent=(newBest?'✦ New personal best · ':'')+`${stars} star${stars===1?'':'s'} collected`;$('resultEyebrow').textContent=newBest?'New record!':'Mission ended';
  hud();contUI();$('watchAdBtn').disabled=false;
  $('rewardNote').textContent=starBank>=25?'Spend 25 stars to keep flying. Continue as many times as your star bank allows.':'Not enough stars to continue. Watch a rewarded ad to earn 10 more, or fly again.';
- setTimeout(()=>{if(state==='over')showGameOverWithInterstitial()},420);
+ setTimeout(()=>{if(state==='over')$('overOverlay').classList.remove('hidden')},420);
 }
 function drawBackground(){
  const k=(time/32)%3,i=Math.floor(k),n=(i+1)%3,t=ease(k-i);
@@ -321,7 +334,7 @@ function togglePause(){
  if(state==='playing'){state='paused';$('pauseOverlay').classList.remove('hidden');$('pauseBtn').textContent='▶'}
  else if(state==='paused'){$('pauseOverlay').classList.add('hidden');$('pauseBtn').textContent='Ⅱ';beginCount(2,false)}
 }
-function action(){if(state==='playing')boost();else if(state==='ready'||state==='over')start();else if(state==='paused')togglePause()}
+function action(){if(state==='playing')boost();else if(state==='ready')start();else if(state==='over')showAd(start);else if(state==='paused')togglePause()}
 function continueFlight(){
  if(state!=='over'||starBank<25)return;
  starBank-=25;inv=2.4;streak=0;try{localStorage.setItem('rocketDashStarBank',String(starBank))}catch(e){}
@@ -330,49 +343,26 @@ function continueFlight(){
  rocket.y=H*.5;rocket.vy=0;rocket.tilt=0;particles=[];beginCount(2,false);
  $('hint').innerHTML='<b>Continue!</b> Brief protection is active<br><span>Keep flying and collect more stars.</span>';hud();
 }
-// Interstitial placement at the natural game-over transition. The game-over UI is
-// always revealed, including when the API is unavailable or no ad is filled.
-function showGameOverWithInterstitial(){
- if(state!=='over')return;
- completedRunsForAds++;
- try{localStorage.setItem('rocketDashCompletedRunsForAds',String(completedRunsForAds))}catch(e){}
- const showGameOver=()=>{if(state==='over')$('overOverlay').classList.remove('hidden')};
- if(completedRunsForAds%3!==0||typeof window.adBreak!=='function'){showGameOver();return}
- let completed=false;
- const finish=()=>{if(completed)return;completed=true;showGameOver()};
- try{
-  window.adBreak({type:'next',name:'rocket-dash-game-over-interstitial',
-   beforeAd:function(){/* Game state is already over; no gameplay continues behind the ad. */},
-   afterAd:function(){/* Resume the game-over screen after the interstitial closes. */},
-   adBreakDone:function(info){
-    console.info('[H5 Ads] Rocket Dash interstitial completed:', info && info.breakStatus ? info.breakStatus : 'status unavailable', info || '');
-    finish();
-   }
-  });
- }catch(e){console.error('[H5 Ads] Rocket Dash interstitial failed:',e);finish()}
-}
 function watchRewardAd(){
  if(adInProgress)return;
  if(typeof window.adBreak!=='function'){$('rewardNote').textContent='Rewarded ads are not available. The game must be served from an approved site with Google H5 Games Ads configured.';return}
  adInProgress=true;$('watchAdBtn').disabled=true;$('rewardNote').textContent='Loading a rewarded ad…';
- let rewarded=false;const finish=()=>{adInProgress=false;$('watchAdBtn').disabled=false};
+ let started=false;setTimeout(()=>{if(!started&&adInProgress){adInProgress=false;$('watchAdBtn').disabled=false;$('rewardNote').textContent='Ads could not load. Turn off your ad blocker or try again later.'}},6000);
+ let rewarded=false,rSaved=null;const finish=()=>{adInProgress=false;$('watchAdBtn').disabled=false;if(rSaved!==null){soundOn=rSaved;rSaved=null}};
  try{window.adBreak({type:'reward',name:'rocket-dash-earn-stars',
-  beforeReward:function(showAdFn){$('rewardNote').textContent='Complete the ad to earn 10 stars.';if(typeof showAdFn==='function')showAdFn()},
+  beforeReward:function(showAdFn){started=true;rSaved=soundOn;soundOn=false;$('rewardNote').textContent='Complete the ad to earn 10 stars.';if(typeof showAdFn==='function')showAdFn()},
   adViewed:function(){if(rewarded)return;rewarded=true;starBank+=10;try{localStorage.setItem('rocketDashStarBank',String(starBank))}catch(e){}$('rewardNote').textContent='Thanks for watching! 10 stars added.';contUI();hud();if(starBank>=25)$('rewardNote').textContent='Thanks for watching! 10 stars added. You can continue now.'},
   adDismissed:function(){$('rewardNote').textContent='Ad closed before completion. No stars awarded.'},
-  adBreakDone:function(info){
-   console.info('[H5 Ads] Rocket Dash rewarded placement completed:', info && info.breakStatus ? info.breakStatus : 'status unavailable', info || '');
-   finish();if(!rewarded&&(!info||info.breakStatus!=='viewed'))$('rewardNote').textContent='No rewarded ad was available. Your stars have not changed.'
-  }
- })}catch(e){console.error('[H5 Ads] Rocket Dash rewarded placement failed:',e);finish();$('rewardNote').textContent='Could not load an ad. Please try again later.'}
+  adBreakDone:function(info){finish();if(!rewarded&&(!info||info.breakStatus!=='viewed'))$('rewardNote').textContent='No rewarded ad was available. Your stars have not changed.'}
+ })}catch(e){finish();$('rewardNote').textContent='Could not load an ad. Please try again later.'}
 }
-$('continueBtn').onclick=continueFlight;$('watchAdBtn').onclick=watchRewardAd;$('startBtn').onclick=start;$('restartBtn').onclick=start;
+$('continueBtn').onclick=continueFlight;$('watchAdBtn').onclick=watchRewardAd;$('startBtn').onclick=start;$('restartBtn').onclick=()=>showAd(start);
 $('homeBtn').onclick=()=>{state='ready';shell.classList.remove('is-playing');$('overOverlay').classList.add('hidden');$('startOverlay').classList.remove('hidden');rocket={x:W*.25,y:H*.48,vy:0,tilt:0};gates=[];starItems=[];powers=[];floats=[];$('buffs').textContent=''};
 $('pauseBtn').onclick=()=>{if(state==='playing'||state==='paused')togglePause()};$('resumeBtn').onclick=togglePause;
 $('quitBtn').onclick=()=>{state='over';shell.classList.remove('is-playing');$('pauseOverlay').classList.add('hidden');$('pauseBtn').textContent='Ⅱ';$('overOverlay').classList.remove('hidden');$('finalScore').textContent=Math.floor(score);$('resultLine').textContent=`Run ended early · ${stars} stars collected`;$('continueBtn').classList.add('hidden')};
 $('soundBtn').onclick=()=>{soundOn=!soundOn;$('soundBtn').textContent=soundOn?'♫':'♪';$('soundBtn').style.opacity=soundOn?'1':'.55';if(soundOn)sound(600,.05)};
 shell.addEventListener('pointerdown',e=>{if(e.target.closest('button,.card,a'))return;if(state==='playing'){e.preventDefault();boost()}},{passive:false});
-addEventListener('keydown',e=>{if(['Space','ArrowUp','KeyW'].includes(e.code)){e.preventDefault();if(!e.repeat)action()}else if(e.code==='Escape'||e.code==='KeyP'){if(state==='playing'||state==='paused')togglePause()}else if(e.code==='KeyR'&&state==='over')start()});
+addEventListener('keydown',e=>{if(['Space','ArrowUp','KeyW'].includes(e.code)){e.preventDefault();if(!e.repeat)action()}else if(e.code==='Escape'||e.code==='KeyP'){if(state==='playing'||state==='paused')togglePause()}else if(e.code==='KeyR'&&state==='over')showAd(start)});
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&state==='playing')togglePause()});
 reset();requestAnimationFrame(frame);
 })();

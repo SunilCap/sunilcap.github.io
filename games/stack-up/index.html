@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Stack Up — One-Tap Block Stacking | Scotcha</title>
+<meta name="description" content="Stack Up: tap to drop sliding blocks and build the tallest tower. Land them perfectly for combos. Free browser game by Scotcha.">
+<meta name="theme-color" content="#8fdcff">
+<link rel="manifest" href="/games/stack-up/manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="64x64" href="/icons/stack-up-favicon-64.png">
+<link rel="apple-touch-icon" href="/icons/stack-up-apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Stack Up">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#dff7ff;font-family:"Baloo 2","Fredoka","Trebuchet MS",system-ui,sans-serif;color:#26344a;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+body{display:grid;place-items:center}
+#shell{position:relative;width:min(100vw,56.25vh);height:min(100dvh,177.78vw);max-width:620px;max-height:1100px;overflow:hidden;background:#9be3ff;isolation:isolate}
+@media (min-aspect-ratio:1/1){#shell{width:min(100vw,1100px);height:min(100dvh,66vw);max-width:1100px;max-height:720px}}
+canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.hud{position:absolute;z-index:2;inset:0;pointer-events:none;padding:clamp(14px,3vw,25px);display:flex;flex-direction:column}
+.top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.topleft{display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.brand{font-size:clamp(11px,2vw,14px);color:#365e7b;font-weight:800}.brand b{display:block;color:#243a56;font-size:clamp(20px,4vw,28px);margin-top:1px}
+.chip{display:none;gap:12px;align-items:center;padding:3px 14px;border-radius:14px;background:#ffffffb8;border:2px solid #fff;box-shadow:0 3px #305e7a1f;font-size:clamp(20px,5vw,26px);font-weight:800;line-height:1.3;font-variant-numeric:tabular-nums}
+.is-playing .chip{display:flex}#combo{font-size:.75em;color:#e4572e;min-height:1.2em}
+.pill{border:2px solid #fff;background:#ffffffdb;border-radius:16px;padding:6px 12px;min-width:84px;text-align:right;box-shadow:0 3px #305e7a20}
+.pill small{display:block;font-size:12px;color:#54728a;font-weight:800}.pill strong{display:block;font-size:clamp(20px,4vw,26px);line-height:1.1;font-variant-numeric:tabular-nums}
+.bottom{margin-top:auto;display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.bl{display:flex;flex-direction:column;align-items:flex-start;gap:8px}
+.hint{font-size:14px;line-height:1.4;color:#315b77;text-shadow:0 1px #fff6;font-weight:700}.hint b{color:#243a56}
+.iconbtn{pointer-events:auto;border:2px solid #fff;background:#fff;color:#36536c;border-radius:14px;width:44px;height:44px;font-size:17px;cursor:pointer;box-shadow:0 3px #305e7a20;display:grid;place-items:center;text-decoration:none;font-weight:900;font-family:inherit}.iconbtn:active{transform:translateY(2px)}
+.is-playing .iconbtn{opacity:.85;width:40px;height:40px}.is-playing .pill{opacity:.8;transform:scale(.85);transform-origin:bottom right}
+.sbrand{display:inline-flex;align-items:center;gap:6px;padding:3px 11px 3px 4px;border-radius:999px;background:#ffffffc7;border:2px solid #fff;box-shadow:0 2px #305e7a22;color:#26344a;font-weight:800;font-size:12px;letter-spacing:.2px;pointer-events:none;white-space:nowrap}
+.sbrand i{font-style:normal;display:grid;place-items:center;width:20px;height:20px;border-radius:50%;background:linear-gradient(#ffd34d,#ff9a3c);color:#fff;font-weight:900;font-size:12px;text-shadow:0 1px #b8621c88}
+.overlay{position:absolute;z-index:5;inset:0;display:grid;place-items:center;padding:20px;background:#3675972e;overflow-y:auto}
+.card{width:min(100%,370px);padding:clamp(20px,5vw,30px);border-radius:28px;text-align:center;background:#fffdf4;border:3px solid #fff;box-shadow:0 7px #37688333,0 18px 45px #264d6529;animation:in .45s cubic-bezier(.3,1.4,.5,1)}
+@keyframes in{from{transform:translateY(24px) scale(.9);opacity:0}}
+.eyebrow{color:#e48b32;font-weight:800;font-size:13px}
+h1{font-size:clamp(38px,9vw,56px);line-height:.95;margin:10px 0;color:#263a54;text-shadow:0 3px #263a5414}
+.subtitle{font-size:15px;line-height:1.45;color:#60788b;margin:0 auto 16px;max-width:290px}
+.shipmark{margin:0 auto 12px;width:84px;height:84px;display:grid;place-items:center;border-radius:26px;background:#ffdc79;border:3px solid #fff;box-shadow:0 4px #efb64e;animation:float 2.2s ease-in-out infinite}.shipmark span{font-size:43px}@keyframes float{50%{transform:translateY(-7px) rotate(-4deg)}}
+.tips{display:flex;justify-content:center;gap:12px;margin:0 0 14px;font-size:14px;color:#60788b;font-weight:700;flex-wrap:wrap}
+.primary{width:100%;border:0;border-radius:15px;padding:13px 18px;background:#ffca45;color:#263a54;font-size:18px;font-weight:800;cursor:pointer;box-shadow:0 5px #e6a72b;font-family:inherit}.primary:active{transform:translateY(4px);box-shadow:0 1px #e6a72b}
+.secondary{margin-top:10px;width:100%;display:block;border:2px solid #dce8ec;border-radius:13px;padding:10px;background:#f4fafb;color:#426078;font-size:15px;font-weight:800;cursor:pointer;text-decoration:none;font-family:inherit}
+.controls{display:flex;gap:10px;justify-content:center;margin-top:14px;color:#678296;font-size:13px;font-weight:700}
+.key{display:inline-grid;place-items:center;min-width:24px;height:22px;padding:0 6px;border:1px solid #d3e1e7;border-radius:7px;color:#426078;background:#f0f7fa;font-weight:800;margin-right:4px;font-style:normal}
+.cardbrand{margin-top:14px;font-size:13px;font-weight:700;color:#678296}.cardbrand b{color:#e48b32}
+.gameover-score{font-size:56px;font-weight:800;margin:0;line-height:1.1}.bestline{font-size:14px;color:#6d8797;font-weight:700;margin-bottom:12px}
+.is-playing .brand,.is-playing .hint,.is-playing #backHomeBtn{display:none!important}.hidden{display:none!important}
+#installHint{font-size:13px;color:#60788b;font-weight:700;margin-top:8px;line-height:1.4}
+:focus-visible{outline:3px solid #ff8b5c;outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+<!-- Google H5 Games Ads. Both scripts are required: the second one creates adBreak() and adConfig(). -->
+<!-- To test with fake ads, temporarily add data-adbreak-test="on" to the first script. Remove it before going live. -->
+<script async data-ad-client="ca-pub-2129877342025466" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2129877342025466" crossorigin="anonymous"></script>
+<script>
+window.adsbygoogle = window.adsbygoogle || [];
+var adBreak = adConfig = function(o) { adsbygoogle.push(o); };
+adConfig({ preloadAdBreaks: 'on', sound: 'on' });
+</script>
+</head>
+<body>
+<div id="shell" aria-label="Stack Up game">
+<canvas id="game" aria-label="Stack Up playfield"></canvas>
+<div class="hud">
+  <div class="top">
+    <div class="topleft">
+      <div class="brand">One-tap arcade<b>Stack Up</b></div>
+      <div class="chip" aria-label="Floors and combo"><span>🧱 <span id="score">0</span></span><span id="combo"></span></div>
+    </div>
+    <div style="display:flex;gap:7px;pointer-events:auto;align-items:center">
+      <a class="iconbtn" id="backHomeBtn" href="/" aria-label="Back to Scotcha home" title="Back to home" style="font-size:22px">⌂</a>
+      <button class="iconbtn" id="fsBtn" aria-label="Full screen" title="Full screen">⛶</button>
+      <button class="iconbtn" id="soundBtn" aria-label="Toggle sound" title="Toggle sound">♫</button>
+      <button class="iconbtn" id="pauseBtn" aria-label="Pause game" title="Pause">Ⅱ</button>
+    </div>
+  </div>
+  <div class="bottom">
+    <div class="bl">
+      <div class="hint" id="hint"><b>Tap</b> to drop the block<br><span>Line it up. Overhang gets sliced off!</span></div>
+      <div class="sbrand" aria-hidden="true"><i>S</i>scotcha.in</div>
+    </div>
+    <div class="pill"><small>Best</small><strong id="best">0</strong></div>
+  </div>
+</div>
+<div class="overlay" id="startOverlay">
+  <div class="card">
+    <div class="shipmark"><span>🧱</span></div>
+    <div class="eyebrow">How high can you go?</div>
+    <h1>Stack<br><span style="color:#ff8b5c">Up</span></h1>
+    <p class="subtitle">Drop each sliding block onto the tower. Land it perfectly to keep your size and build a combo.</p>
+    <div class="tips"><span>🎯 Perfect = combo</span><span>🌅 Day to night</span></div>
+    <button class="primary" id="startBtn">Start stacking ↗</button>
+    <a class="secondary" href="/" aria-label="Back to Scotcha home">⌂ Back to home</a>
+    <button class="secondary hidden" id="installBtn">📲 Install · play full screen</button>
+    <div id="installHint" class="hidden"></div>
+    <div class="controls"><span><i class="key">Tap</i>drop</span><span><i class="key">Space</i>desktop</span></div>
+    <div class="cardbrand">A game by <b>Scotcha</b> · scotcha.in</div>
+  </div>
+</div>
+<div class="overlay hidden" id="overOverlay">
+  <div class="card">
+    <div class="eyebrow" id="resultEyebrow">Tower fell</div>
+    <h1 style="font-size:38px">Game<br><span style="color:#ff8b5c">over</span></h1>
+    <div class="gameover-score" id="finalScore">0</div>
+    <div class="bestline" id="resultLine">floors</div>
+    <button class="primary" id="restartBtn">Stack again ↻</button>
+    <button class="secondary" id="shareBtn">📤 Share my score</button>
+    <button class="secondary" id="homeBtn">Main menu</button>
+    <a class="secondary" href="/" aria-label="Back to Scotcha home">⌂ Back to home</a>
+    <div class="cardbrand">A game by <b>Scotcha</b> · scotcha.in</div>
+  </div>
+</div>
+<div class="overlay hidden" id="pauseOverlay">
+  <div class="card">
+    <div class="eyebrow">Taking a break</div><h1 style="font-size:42px">Paused</h1>
+    <button class="primary" id="resumeBtn">Resume ▶</button>
+    <button class="secondary" id="quitBtn">End run</button>
+  </div>
+</div>
+</div>
+<script>
+(() => {
+'use strict';
+const $=id=>document.getElementById(id),cv=$('game'),ctx=cv.getContext('2d'),shell=$('shell');
+const rand=(a,b)=>a+Math.random()*(b-a),clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),ease=t=>t*t*(3-2*t);
+const rgb=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)),mix=(a,b,t)=>`rgb(${a.map((v,i)=>Math.round(v+(b[i]-v)*t)).join()})`;
+const REDUCE=matchMedia('(prefers-reduced-motion:reduce)').matches;
+const SKY=[['#8fdcff','#dcf6ff'],['#ff9f7a','#ffe1a6'],['#141b4d','#3d4290']].map(p=>p.map(rgb)),NIGHT=[0,.3,1];
+let W=0,H=0,DPR=1,state='ready',last=0,time=0,cam=0,score=0,best=0,combo=0,maxCombo=0,skyP=0,night=0,shake=0,flash=0,newBest=false;
+let stack=[],mv=null,pieces=[],parts=[],floats=[],clouds=[],bgStars=[],soundOn=true,audioCtx=null,hue0=200,w0=200;
+try{best=Number(localStorage.getItem('stackUpBest')||0)||0}catch(e){}
+$('best').textContent=best;
+const bh=()=>Math.max(26,Math.min(40,H*.045)),gY=()=>H*.8;
+// Interstitial ad at a natural break (play again). Google decides whether an ad really shows; the game always continues.
+let adBusy = false, adLast = 0;
+function showAd(next) {
+  if (adBusy) return;
+  if (typeof adBreak !== 'function' || Date.now() - adLast < 45000) { next(); return; }
+  adBusy = true; let shown = false, done = false, saved;
+  const fin = function() { if (done) return; done = true; adBusy = false; next(); };
+  try {
+    adBreak({
+      type: 'next', name: 'play-again',
+      beforeAd: function() { shown = true; saved = soundOn; soundOn = false; },
+      afterAd: function() { soundOn = saved; adLast = Date.now(); },
+      adBreakDone: fin
+    });
+    // If ads are blocked or slow, never leave the player waiting.
+    setTimeout(function() { if (!shown) fin(); }, 3000);
+  } catch (e) { fin(); }
+}
+function resize(){
+ const r=shell.getBoundingClientRect(),old=W;DPR=Math.min(devicePixelRatio||1,2);W=r.width;H=r.height;
+ cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);ctx.setTransform(DPR,0,0,DPR,0,0);
+ if(old&&old!==W){const k=W/old;[...stack,...pieces,...parts].forEach(o=>{o.x*=k;if(o.w)o.w*=k});if(mv){mv.x*=k;mv.w*=k}w0*=k}
+ else w0=Math.min(W*.55,280);
+ if(!bgStars.length){for(let i=0;i<70;i++)bgStars.push({x:Math.random(),y:Math.random()*.8,r:.6+Math.random()*1.4,p:Math.random()*6});
+  for(let i=0;i<6;i++)clouds.push({x:Math.random(),y:Math.random(),s:.5+Math.random()*.6,z:.15+Math.random()*.3,sp:5+Math.random()*8})}
+}
+addEventListener('resize',resize);resize();
+function sound(f=440,d=.1,t='sine',v=.04){
+ if(!soundOn)return;
+ try{audioCtx||=new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume();
+ const o=audioCtx.createOscillator(),g=audioCtx.createGain(),n=audioCtx.currentTime;o.type=t;o.frequency.setValueAtTime(f,n);g.gain.setValueAtTime(v,n);g.gain.exponentialRampToValueAtTime(.001,n+d);o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(n+d)}catch(e){}
+}
+const note=i=>262*Math.pow(2,([0,2,4,7,9][i%5]+12*Math.floor(i/5))/12);
+function reset(){
+ score=0;combo=0;maxCombo=0;cam=0;skyP=0;shake=0;flash=0;newBest=false;pieces=[];parts=[];floats=[];hue0=Math.floor(rand(0,360));
+ stack=[{x:(W-w0)/2,w:w0,hue:hue0}];newBlock();hud();
+}
+function newBlock(){
+ const top=stack[stack.length-1],n=stack.length,fromL=n%2===0;
+ mv={w:top.w,x:fromL?0:W-top.w,dir:fromL?1:-1,hue:(hue0+n*9)%360};
+}
+function start(){
+ reset();state='playing';shell.classList.add('is-playing');['startOverlay','overOverlay','pauseOverlay'].forEach(i=>$(i).classList.add('hidden'));
+ $('hint').innerHTML='<b>Tap</b> to drop<br><span>Perfect drops keep your size.</span>';
+}
+function burst(x,y,color,n,spd=180){for(let i=0;i<n;i++){const a=rand(-Math.PI,0),v=rand(40,spd);parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:rand(.4,.9),max:.9,size:rand(2,5),color,w:0})}}
+function topY(i){return gY()-(i+1)*bh()+cam}
+function drop(){
+ if(state!=='playing'||!mv)return;
+ const top=stack[stack.length-1],B=bh(),tol=Math.max(4,W*.013);
+ const l=Math.max(mv.x,top.x),r=Math.min(mv.x+mv.w,top.x+top.w),ov=r-l,lvl=stack.length;
+ if(ov<=0){pieces.push({x:mv.x,w:mv.w,wy:lvl*B,vy:0,vx:mv.dir*60,rot:0,vr:mv.dir*1.2,hue:mv.hue});mv=null;gameOver();return}
+ if(Math.abs(mv.x-top.x)<=tol){
+  combo++;maxCombo=Math.max(maxCombo,combo);let nx=top.x,nw=top.w;
+  if(combo>=3&&nw<w0){const g=Math.min(w0-nw,W*.03);nw+=g;nx=clamp(nx-g/2,0,W-nw)}
+  stack.push({x:nx,w:nw,hue:mv.hue});sound(note(Math.min(combo,14)),.18,'triangle',.05);
+  parts.push({ring:true,x:nx,w:nw,lvl,life:.45,max:.45,x0:0,y:0,vx:0,vy:0,size:0,color:''});
+  burst(nx,topY(lvl),`hsl(${mv.hue} 90% 70%)`,10);burst(nx+nw,topY(lvl),'#fff',8);
+  floats.push({txt:combo>1?`PERFECT x${combo}`:'PERFECT!',x:W/2,y:topY(lvl)-18,life:1,c:'#ffe16a'});flash=.12;
+ }else{
+  combo=0;sound(200+Math.random()*30,.09,'triangle',.05);
+  const cutL=mv.x<top.x,cx=cutL?mv.x:r,cw=cutL?top.x-mv.x:(mv.x+mv.w)-r;
+  pieces.push({x:cx,w:cw,wy:lvl*B,vy:0,vx:cutL?-50:50,rot:0,vr:cutL?-1.4:1.4,hue:mv.hue});
+  stack.push({x:l,w:ov,hue:mv.hue});shake=REDUCE?0:3;
+ }
+ score=stack.length-1;newBlock();hud();
+}
+function gameOver(){
+ state='over';shell.classList.remove('is-playing');shake=REDUCE?0:8;sound(130,.3,'sawtooth',.05);
+ newBest=score>best;if(newBest){best=score;try{localStorage.setItem('stackUpBest',String(best))}catch(e){}}
+ $('finalScore').textContent=score;$('resultEyebrow').textContent=newBest?'New record!':'Tower fell';
+ $('resultLine').textContent=(newBest?'✦ New personal best · ':'Best: '+best+' · ')+`${maxCombo} perfect streak`;hud();
+ setTimeout(()=>{if(state==='over')$('overOverlay').classList.remove('hidden')},650);
+}
+function hud(){$('score').textContent=score;$('combo').textContent=combo>=2?`🔥 x${combo}`:'';$('best').textContent=Math.max(best,score)}
+function update(dt){
+ time+=dt;skyP+=(score-skyP)*Math.min(1,dt*2);
+ const B=bh(),camT=Math.max(0,stack.length*B-(gY()-H*.5));cam+=(camT-cam)*Math.min(1,dt*5);
+ if(state==='playing'&&mv){
+  const spd=W*(.55+Math.min(.85,score*.016));mv.x+=mv.dir*spd*dt;
+  if(mv.x<=0){mv.x=0;mv.dir=1}else if(mv.x+mv.w>=W){mv.x=W-mv.w;mv.dir=-1}
+ }
+ for(const p of pieces){p.vy+=H*1.6*dt;p.wy-=p.vy*dt;p.x+=p.vx*dt;p.rot+=p.vr*dt}
+ pieces=pieces.filter(p=>gY()-p.wy-B+cam<H+120);
+ for(const p of parts){if(p.ring){p.life-=dt;continue}p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=500*dt;p.life-=dt}
+ parts=parts.filter(p=>p.life>0);
+ for(const f of floats){f.y-=40*dt;f.life-=dt*.9}floats=floats.filter(f=>f.life>0);
+ shake=Math.max(0,shake-dt*20);flash=Math.max(0,flash-dt);
+}
+function drawBg(){
+ const k=(skyP/18)%3,i=Math.floor(k),n=(i+1)%3,t=ease(k-i);night=NIGHT[i]+(NIGHT[n]-NIGHT[i])*t;
+ const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,mix(SKY[i][0],SKY[n][0],t));g.addColorStop(1,mix(SKY[i][1],SKY[n][1],t));ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+ if(night>.05){for(const s of bgStars){ctx.globalAlpha=night*(.45+.55*Math.sin(time*2+s.p));ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(s.x*W,s.y*H,s.r,0,6.283);ctx.fill()}ctx.globalAlpha=1}
+ const sr=Math.min(W,H)*.07,sx=W*.8,sy=H*.15;
+ ctx.globalAlpha=1-night;ctx.fillStyle='#ffe27a';ctx.beginPath();ctx.arc(sx,sy,sr,0,6.283);ctx.fill();
+ ctx.globalAlpha=night;ctx.fillStyle='#fff6d8';ctx.beginPath();ctx.arc(sx,sy,sr*.85,0,6.283);ctx.fill();ctx.globalAlpha=1;
+ ctx.fillStyle=mix([248,253,255],[120,130,190],night);
+ for(const c of clouds){const x=((c.x*W-time*c.sp)%(W+240)+W+240)%(W+240)-120,y=((c.y*H*.8+cam*c.z)%(H+100)+H+100)%(H+100)-50;
+  ctx.save();ctx.translate(x,y);ctx.scale(c.s,c.s);ctx.beginPath();ctx.arc(0,8,17,Math.PI,0);ctx.arc(17,-2,22,Math.PI,0);ctx.arc(39,8,16,Math.PI,0);ctx.lineTo(55,17);ctx.lineTo(-17,17);ctx.fill();ctx.restore()}
+ const gy=gY()+cam;
+ if(gy<H+40){ctx.fillStyle=mix(rgb('#75d66b'),[16,30,60],night*.6);ctx.beginPath();ctx.moveTo(0,H+10);
+  for(let x=0;x<=W+10;x+=10)ctx.lineTo(x,gy-8+Math.sin(x/70)*10);ctx.lineTo(W+10,H+10);ctx.closePath();ctx.fill();
+  ctx.fillStyle=mix(rgb('#53c85d'),[16,30,60],night*.6);ctx.fillRect(0,gy+4,W,H);}
+}
+function block(x,top,w,h,hue,a=1){
+ ctx.globalAlpha=a;ctx.fillStyle=`hsl(${hue} 78% 62%)`;ctx.strokeStyle='#26344a';ctx.lineWidth=3;ctx.beginPath();ctx.roundRect(x,top,w,h,6);ctx.fill();ctx.stroke();
+ ctx.fillStyle=`hsl(${hue} 90% 76%)`;ctx.beginPath();ctx.roundRect(x+4,top+4,Math.max(0,w-8),Math.max(0,h*.26),3);ctx.fill();ctx.globalAlpha=1;
+}
+function draw(){
+ ctx.save();if(shake>0)ctx.translate(rand(-shake,shake),rand(-shake,shake));
+ drawBg();const B=bh();
+ stack.forEach((b,i)=>{const y=topY(i);if(y>-B&&y<H+B)block(b.x,y,b.w,B,b.hue)});
+ if(mv&&state==='playing')block(mv.x,topY(stack.length),mv.w,B,mv.hue);
+ for(const p of pieces){const y=gY()-p.wy-B+cam;ctx.save();ctx.translate(p.x+p.w/2,y+B/2);ctx.rotate(p.rot);block(-p.w/2,-B/2,p.w,B,p.hue,.95);ctx.restore()}
+ for(const p of parts){
+  if(p.ring){const t=1-p.life/p.max,g=t*14;ctx.globalAlpha=1-t;ctx.strokeStyle='#fff';ctx.lineWidth=4;ctx.beginPath();ctx.roundRect(p.x-g,topY(p.lvl)-g,p.w+g*2,B+g*2,10);ctx.stroke();ctx.globalAlpha=1;continue}
+  ctx.globalAlpha=Math.max(0,p.life/p.max);ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,6.283);ctx.fill()}ctx.globalAlpha=1;
+ ctx.textAlign='center';ctx.textBaseline='middle';
+ for(const f of floats){ctx.globalAlpha=clamp(f.life*1.6,0,1);ctx.font='800 22px "Baloo 2",system-ui,sans-serif';ctx.lineWidth=5;ctx.strokeStyle='#26344acc';ctx.strokeText(f.txt,f.x,f.y);ctx.fillStyle=f.c;ctx.fillText(f.txt,f.x,f.y)}ctx.globalAlpha=1;
+ if(flash>0){ctx.fillStyle=`rgba(255,255,255,${flash*.9})`;ctx.fillRect(0,0,W,H)}
+ ctx.restore();
+}
+function frame(now){const dt=Math.min(.035,(now-last)/1000||0);last=now;if(state!=='paused')update(dt);draw();requestAnimationFrame(frame)}
+function pause(){if(state==='playing'){state='paused';$('pauseOverlay').classList.remove('hidden');$('pauseBtn').textContent='▶'}else if(state==='paused'){state='playing';$('pauseOverlay').classList.add('hidden');$('pauseBtn').textContent='Ⅱ'}}
+function toMenu(){state='ready';shell.classList.remove('is-playing');$('overOverlay').classList.add('hidden');$('pauseOverlay').classList.add('hidden');$('startOverlay').classList.remove('hidden');$('pauseBtn').textContent='Ⅱ';reset();mv=null}
+$('startBtn').onclick=start;$('restartBtn').onclick=()=>showAd(start);$('homeBtn').onclick=toMenu;$('resumeBtn').onclick=pause;
+$('pauseBtn').onclick=()=>{if(state==='playing'||state==='paused')pause()};
+$('quitBtn').onclick=()=>{$('pauseOverlay').classList.add('hidden');$('pauseBtn').textContent='Ⅱ';state='playing';mv&&pieces.push({x:mv.x,w:mv.w,wy:stack.length*bh(),vy:0,vx:0,rot:0,vr:1,hue:mv.hue});mv=null;gameOver()};
+$('soundBtn').onclick=()=>{soundOn=!soundOn;$('soundBtn').textContent=soundOn?'♫':'♪';$('soundBtn').style.opacity=soundOn?'1':'.55';if(soundOn)sound(600,.05)};
+$('shareBtn').onclick=async()=>{
+ const text=`I stacked ${score} floors in Stack Up! Can you beat me?`,url=location.origin+'/games/stack-up/';
+ try{if(navigator.share)await navigator.share({title:'Stack Up — Scotcha',text,url});else{await navigator.clipboard.writeText(text+' '+url);$('shareBtn').textContent='✓ Link copied'}}catch(e){}
+};
+shell.addEventListener('pointerdown',e=>{if(e.target.closest('button,.card,a'))return;if(state==='playing'){e.preventDefault();drop()}},{passive:false});
+addEventListener('keydown',e=>{if(['Space','Enter','ArrowDown'].includes(e.code)){e.preventDefault();if(e.repeat)return;if(state==='playing')drop();else if(state==='ready')start();else if(state==='over')showAd(start);else if(state==='paused')pause()}else if(e.code==='Escape'||e.code==='KeyP'){if(state==='playing'||state==='paused')pause()}});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&state==='playing')pause()});
+reset();mv=null;requestAnimationFrame(frame);
+// Offline + install support (shared Scotcha service worker)
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));
+// Full screen
+const de=document.documentElement,req=de.requestFullscreen||de.webkitRequestFullscreen,exit=document.exitFullscreen||document.webkitExitFullscreen,fs=$('fsBtn');
+const standalone=matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches||navigator.standalone===true;
+const isFS=()=>!!(document.fullscreenElement||document.webkitFullscreenElement);
+if(!req||standalone)fs.classList.add('hidden');
+fs.onclick=()=>{try{isFS()?exit.call(document):req.call(de)}catch(e){}};
+const syncFs=()=>{fs.textContent=isFS()?'⤡':'⛶'};document.addEventListener('fullscreenchange',syncFs);document.addEventListener('webkitfullscreenchange',syncFs);
+// Install button
+const ib=$('installBtn'),hint=$('installHint'),ios=/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);let deferred=null;
+if(!standalone){
+ if(ios)ib.classList.remove('hidden');
+ addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e;ib.classList.remove('hidden')});
+ addEventListener('appinstalled',()=>{ib.classList.add('hidden');hint.classList.add('hidden')});
+ ib.onclick=async()=>{if(deferred){deferred.prompt();try{await deferred.userChoice}catch(e){}deferred=null;ib.classList.add('hidden')}else{hint.textContent='On iPhone or iPad: tap Share, then “Add to Home Screen”. It opens full screen like an app.';hint.classList.remove('hidden')}};
+}
+})();
+</script>
+</body>
+</html>

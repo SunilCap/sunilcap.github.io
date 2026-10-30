@@ -78,6 +78,14 @@
   .modeBtn:active { transform: translateY(2px); box-shadow: 0 1px 0 #2b1b0e; }
   .modeBtn.active { background: #ffe156; border-color: #c9a300; }
 </style>
+<!-- Google H5 Games Ads. Both scripts are required: the second one creates adBreak() and adConfig(). -->
+<!-- To test with fake ads, temporarily add data-adbreak-test="on" to the first script. Remove it before going live. -->
+<script async data-ad-client="ca-pub-2129877342025466" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2129877342025466" crossorigin="anonymous"></script>
+<script>
+window.adsbygoogle = window.adsbygoogle || [];
+var adBreak = adConfig = function(o) { adsbygoogle.push(o); };
+adConfig({ preloadAdBreaks: 'on', sound: 'on' });
+</script>
 </head>
 <body>
 <h2>🏐 Volleyball Duel — Cartoon Edition</h2>
@@ -429,6 +437,24 @@ function awardPoint(side) {
     setTimeout(function(){ pointPopup.classList.remove('show'); resetServe(nextServer); pointPaused = false; }, 1400);
   }
 }
+// Interstitial ad at a natural break (play again). Google decides whether an ad really shows; the game always continues.
+let adBusy = false, adLast = 0;
+function showAd(next) {
+  if (adBusy) return;
+  if (typeof adBreak !== 'function' || Date.now() - adLast < 45000) { next(); return; }
+  adBusy = true; let shown = false, done = false, saved;
+  const fin = function() { if (done) return; done = true; adBusy = false; next(); };
+  try {
+    adBreak({
+      type: 'next', name: 'play-again',
+      beforeAd: function() { shown = true; saved = 0;  },
+      afterAd: function() {  adLast = Date.now(); },
+      adBreakDone: fin
+    });
+    // If ads are blocked or slow, never leave the player waiting.
+    setTimeout(function() { if (!shown) fin(); }, 3000);
+  } catch (e) { fin(); }
+}
 function restartMatch() {
   score = [0, 0];
   statusEl.textContent = 'Score: ' + score[0] + ' - ' + score[1];
@@ -438,8 +464,8 @@ function restartMatch() {
   p2.x = 500; p2.y = GROUND_Y; p2.vx = 0; p2.vy = 0;
   resetServe(0);
 }
-canvas.addEventListener('click', function(){ if (gameOver) restartMatch(); });
-canvas.addEventListener('touchstart', function(e){ if (gameOver) { e.preventDefault(); restartMatch(); } }, { passive: false });
+canvas.addEventListener('click', function(){ if (gameOver) showAd(restartMatch); });
+canvas.addEventListener('touchstart', function(e){ if (gameOver) { e.preventDefault(); showAd(restartMatch); } }, { passive: false });
 
 let cloudOffset = 0;
 function drawBackgroundExtras() {

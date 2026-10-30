@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-<url><loc>https://sunilcap.github.io/</loc></url>
-<url><loc>https://sunilcap.github.io/about.html</loc></url>
-<url><loc>https://sunilcap.github.io/contact.html</loc></url>
-<url><loc>https://sunilcap.github.io/privacy.html</loc></url>
-<url><loc>https://sunilcap.github.io/terms.html</loc></url>
-<url><loc>https://sunilcap.github.io/games/rocket-dash/</loc></url>
-<url><loc>https://sunilcap.github.io/games/rocket-dash/guide.html</loc></url>
-<url><loc>https://sunilcap.github.io/games/volleyball-duel/guide.html</loc></url>
+<url><loc>https://scotcha.in/</loc><lastmod>2026-10-30</lastmod></url>
+<url><loc>https://scotcha.in/games/</loc><lastmod>2026-10-30</lastmod></url>
+<url><loc>https://scotcha.in/about.html</loc><lastmod>2026-10-30</lastmod></url>
+<url><loc>https://scotcha.in/contact.html</loc><lastmod>2026-10-30</lastmod></url>
+<url><loc>https://scotcha.in/privacy.html</loc><lastmod>2026-10-30</lastmod></url>
+<url><loc>https://scotcha.in/terms.html</loc><lastmod>2026-10-30</lastmod></url>
+<url><loc>https://scotcha.in/games/rocket-dash/</loc><lastmod>2026-10-30</lastmod></url>
+<url><loc>https://scotcha.in/games/rocket-dash/guide.html</loc><lastmod>2026-10-30</lastmod></url>
+<url><loc>https://scotcha.in/games/stack-up/</loc><lastmod>2026-10-30</lastmod></url>
+<url><loc>https://scotcha.in/games/stack-up/guide.html</loc><lastmod>2026-10-30</lastmod></url>
+<url><loc>https://scotcha.in/games/volleyball-duel/</loc><lastmod>2026-10-30</lastmod></url>
+<url><loc>https://scotcha.in/games/volleyball-duel/guide.html</loc><lastmod>2026-10-30</lastmod></url>
+<url><loc>https://scotcha.in/games/word-tower/</loc><lastmod>2026-10-30</lastmod></url>
+<url><loc>https://scotcha.in/games/word-tower/guide.html</loc><lastmod>2026-10-30</lastmod></url>
 </urlset>

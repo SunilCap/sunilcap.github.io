@@ -69,7 +69,15 @@ label{display:block;font-size:13px;font-weight:800;color:#17395e;margin-top:8px;
 :focus-visible{outline:3px solid #ffe75d;outline-offset:2px}
 @media(max-height:680px){#win{max-height:calc(100dvh - 318px)}.ring{width:52px;height:52px}.ring span{font-size:20px}#req{height:36px}}
 @media(prefers-reduced-motion:reduce){*{animation-duration:.01s!important;animation-iteration-count:1!important;transition-duration:.01s!important}}
-</style></head>
+</style><!-- Google H5 Games Ads. Both scripts are required: the second one creates adBreak() and adConfig(). -->
+<!-- To test with fake ads, temporarily add data-adbreak-test="on" to the first script. Remove it before going live. -->
+<script async data-ad-client="ca-pub-2129877342025466" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2129877342025466" crossorigin="anonymous"></script>
+<script>
+window.adsbygoogle = window.adsbygoogle || [];
+var adBreak = adConfig = function(o) { adsbygoogle.push(o); };
+adConfig({ preloadAdBreaks: 'on', sound: 'on' });
+</script>
+</head>
 <body><main id="g">
 <div class="scene"><div class="sun"></div><div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div><div class="mtn"></div><div class="hill"></div><div class="pillar l"><div class="flag"></div></div><div class="pillar r"><div class="flag"></div></div></div>
 <header><a class="pill" href="https://scotcha.in/">⌂ Home</a><div class="pill" id="round">Round 1</div><button class="pill" id="snd" aria-label="Sound on or off">🔊</button><button class="pill" id="fsBtn" aria-label="Full screen" title="Full screen">⛶</button></header>
@@ -99,6 +107,24 @@ const $=i=>document.getElementById(i),NAMES=['You','Alex','Maya','Chris','Sam','
 const DICT=new Set(`ant apple arm art axe air animal arrow eagle earth east eat ear egg elephant energy engine enjoy enter equal echo edge eel elf elk elm end each door dance danger dark data date day deal dear deck deep deer desk dinner dog doll double down dream dress drink drive drop dry duck dust duty fish fan fast farm face fact fall family far fox game gate garden gas gem gift girl give glass globe goat gold good goose grape grass green grow guess guide gum hand happy hard hat have head hear heart heat hill home hope horse house ice idea image inch ink iron island item jacket jam jar jazz jeep jelly jewel job join joke joy judge juice jump jungle kite king kiss kit kitchen knee knife knock knot know lake lamp land large late lazy leaf learn lemon lion list little live load lock long look loop love lucky lunch magic mail main make man mango map march market mask match maze meal meat medal meet melon menu milk mind mint mirror mix model money monkey moon more mother mouse move movie music nail name nap near neck nest net new next nice night nine ninja noble noise north nose note novel nurse nut oak ocean odd offer office oil old olive one onion open orange orbit order organ owl own page paint pair palace panda paper park party pass pasta path peach pearl pen pencil people pepper pet phone piano pick pie pig pilot pink pipe pizza place planet plant plate play plug poem point pool popcorn power price pride print prize puzzle purple queen quick quiet quiz quilt quote quest rabbit race radio rain raise range rapid rare read ready real red rest rice rich ride ring rise river road robot rock rocket room rose round royal ruler run sad safe sail salad salt sand save scale school score sea search season seat secret seed shade shadow shake share sharp sheep sheet shell ship shoe shop show side sign silver simple sing sister six skate sky sleep slice slide small smart smile snack snake snow soap sock soft solar song sound soup space speed spell spice spider spin sport spot spring square star start steam steel step stick stone stop store story storm street strong sugar summer sun sunny table tablet tail take tale talk tall tank tap task taste team tell temple ten tennis tent test text thank theme thing think thunder ticket tide tiger time tiny toast today toe tomato tone tool tooth top torch touch tower town toy track train travel tree trick trip trophy true trust tube tune turn turtle twin ultra umbrella uncle under unit universe unlock upper urban use user vacation valley value van vast velvet video view village visit voice volcano vote wait wake walk wall warm wash watch water wave way weather web week west whale wheel white wide wild win window wing winter wire wise wish wolf wonder wood word work world write xray xenon xylophone yacht yard yam yarn yawn year yellow yes yesterday yet yield yoga young youth zebra zero zone zoo zeal`.split(/\s+/));
 let P=[],turn=0,round=1,req='A',used=new Set(),last=null,dur=15,deadline=0,paused=false,pauseAt=0,iv=null,mode='local',run=false,busy=false,mute=false,lvl='normal',lastSec=0,AC,confId=0;
 const KEY='scotcha-wordtower-best',store={get(){try{return+localStorage.getItem(KEY)||0}catch(e){return 0}},set(v){try{localStorage.setItem(KEY,v)}catch(e){}}};
+// Interstitial ad at a natural break (play again). Google decides whether an ad really shows; the game always continues.
+let adBusy = false, adLast = 0;
+function showAd(next) {
+  if (adBusy) return;
+  if (typeof adBreak !== 'function' || Date.now() - adLast < 45000) { next(); return; }
+  adBusy = true; let shown = false, done = false, saved;
+  const fin = function() { if (done) return; done = true; adBusy = false; next(); };
+  try {
+    adBreak({
+      type: 'next', name: 'play-again',
+      beforeAd: function() { shown = true; saved = mute; mute = true; },
+      afterAd: function() { mute = saved; adLast = Date.now(); },
+      adBreakDone: fin
+    });
+    // If ads are blocked or slow, never leave the player waiting.
+    setTimeout(function() { if (!shown) fin(); }, 3000);
+  } catch (e) { fin(); }
+}
 function beep(f,d=.12,t='sine',v=.07,w=0){if(mute)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain(),s=AC.currentTime+w;o.type=t;o.frequency.value=f;g.gain.setValueAtTime(v,s);g.gain.exponentialRampToValueAtTime(.0001,s+d);o.connect(g);g.connect(AC.destination);o.start(s);o.stop(s+d)}catch(e){}}
 const sfx={ok:()=>[523,659,784].forEach((f,i)=>beep(f,.16,'triangle',.08,i*.07)),bad:()=>beep(170,.25,'sawtooth',.05),out:()=>[400,300,200].forEach((f,i)=>beep(f,.2,'square',.04,i*.1)),tick:()=>beep(900,.05,'square',.03),win:()=>[523,659,784,1047,1319].forEach((f,i)=>beep(f,.28,'triangle',.08,i*.1))};
 const alive=()=>P.filter(p=>p.alive),say=t=>$('status').textContent=t;
@@ -131,7 +157,7 @@ function updBest(){const b=store.get();$('best').textContent=b?`Tallest tower: $
 function confetti(){const c=$('conf'),x=c.getContext('2d');c.width=c.offsetWidth;c.height=c.offsetHeight;const ps=Array.from({length:110},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height*.5,vx:Math.random()*2-1,vy:2+Math.random()*3,r:Math.random()*6,s:5+Math.random()*7,col:COL[Math.floor(Math.random()*8)]}));let t=0;(function f(){x.clearRect(0,0,c.width,c.height);ps.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.r+=.12;x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillStyle=p.col;x.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);x.restore()});if(++t<260)confId=requestAnimationFrame(f);else x.clearRect(0,0,c.width,c.height)})()}
 $('num').onchange=names;$('mode').onchange=()=>$('lvlW').classList.toggle('hidden',$('mode').value!=='bots');
 $('form').addEventListener('submit',e=>{e.preventDefault();submit()});$('word').addEventListener('input',e=>e.target.value=e.target.value.replace(/[^a-z]/gi,'').toUpperCase());
-$('start').onclick=start;$('again').onclick=start;$('how').onclick=()=>show('help');$('back').onclick=()=>show('menu');$('menuBtn').onclick=()=>{cancelAnimationFrame(confId);$('conf').getContext('2d').clearRect(0,0,9999,9999);show('menu')};
+$('start').onclick=start;$('again').onclick=()=>showAd(start);$('how').onclick=()=>show('help');$('back').onclick=()=>show('menu');$('menuBtn').onclick=()=>{cancelAnimationFrame(confId);$('conf').getContext('2d').clearRect(0,0,9999,9999);show('menu')};
 $('snd').onclick=()=>{mute=!mute;$('snd').textContent=mute?'🔇':'🔊'};
 logo();names();updBest();show('menu');
 })();
