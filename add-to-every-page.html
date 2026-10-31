@@ -1,13 +1,15 @@
-<!-- Paste inside <head> of your home page (index.html) and every other page -->
-<link rel="manifest" href="/manifest.webmanifest">
-<link rel="icon" type="image/png" sizes="64x64" href="/icons/favicon-64.png">
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
-<meta name="theme-color" content="#8fdcff">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Scotcha">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Internal notes</title></head><body>
+<pre style="white-space:pre-wrap;font:14px/1.5 monospace">&lt;!-- Paste inside &lt;head&gt; of your home page (index.html) and every other page --&gt;
+&lt;link rel=&quot;manifest&quot; href=&quot;/manifest.webmanifest&quot;&gt;
+&lt;link rel=&quot;icon&quot; type=&quot;image/png&quot; sizes=&quot;64x64&quot; href=&quot;/icons/favicon-64.png&quot;&gt;
+&lt;link rel=&quot;apple-touch-icon&quot; href=&quot;/icons/apple-touch-icon.png&quot;&gt;
+&lt;meta name=&quot;theme-color&quot; content=&quot;#8fdcff&quot;&gt;
+&lt;meta name=&quot;mobile-web-app-capable&quot; content=&quot;yes&quot;&gt;
+&lt;meta name=&quot;apple-mobile-web-app-capable&quot; content=&quot;yes&quot;&gt;
+&lt;meta name=&quot;apple-mobile-web-app-title&quot; content=&quot;Scotcha&quot;&gt;
 
-<!-- Paste just before </body> -->
-<script>
-if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));
-</script>
+&lt;!-- Paste just before &lt;/body&gt; --&gt;
+&lt;script&gt;
+if(&#x27;serviceWorker&#x27; in navigator)addEventListener(&#x27;load&#x27;,()=&gt;navigator.serviceWorker.register(&#x27;/sw.js&#x27;).catch(()=&gt;{}));
+&lt;/script&gt;</pre>
+</body></html>
