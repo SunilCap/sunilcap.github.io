@@ -1,0 +1,26 @@
+{
+  "name": "Hold Up \u2013 Scotcha",
+  "short_name": "Hold Up",
+  "description": "Hold to rise, slide to steer. Free browser game by Scotcha.",
+  "id": "/games/hold-up/",
+  "start_url": "/games/hold-up/",
+  "scope": "/games/hold-up/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#9be3ff",
+  "theme_color": "#8fdcff",
+  "icons": [
+    {
+      "src": "/icons/hold-up-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/hold-up-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

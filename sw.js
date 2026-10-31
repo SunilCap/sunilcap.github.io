@@ -1,6 +1,6 @@
 // Scotcha service worker: makes games installable and playable offline.
 // Bump VERSION whenever you want every player to refresh their cached copy.
-const VERSION = 'scotcha-v7';
+const VERSION = 'scotcha-v8';
 
 // Pages and files to save for offline play. Add the URL of every game here.
 // A URL that doesn't exist is skipped, so it's safe to list games before they're live.
@@ -12,9 +12,11 @@ const PRECACHE = [
   '/games/stack-up/guide.html',
   '/games/volleyball-duel/guide.html',
   '/games/word-tower/guide.html',
+  '/games/hold-up/guide.html',
   '/games/rocket-dash/',
   '/games/word-tower/',
   '/games/volleyball-duel/',
+  '/games/hold-up/',
   '/about.html',
   '/manifest.webmanifest',
   '/games/rocket-dash/manifest.webmanifest',
@@ -30,6 +32,9 @@ const PRECACHE = [
   '/games/stack-up/manifest.webmanifest',
   '/icons/stack-up-192.png',
   '/icons/stack-up-512.png',
+  '/games/hold-up/manifest.webmanifest',
+  '/icons/hold-up-192.png',
+  '/icons/hold-up-512.png',
   '/icons/icon-192.png',
   '/icons/icon-512.png',
   '/icons/icon-maskable-512.png',

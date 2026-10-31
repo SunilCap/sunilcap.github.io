@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Hold Up — Hold to Rise, Slide to Steer | Scotcha</title>
+<meta name="description" content="Hold Up: hold to rise, slide to steer and climb through gaps in endless moving bars. Free browser game by Scotcha.">
+<meta name="theme-color" content="#8fdcff">
+<link rel="manifest" href="/games/hold-up/manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="64x64" href="/icons/hold-up-favicon-64.png">
+<link rel="apple-touch-icon" href="/icons/hold-up-apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Hold Up">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#dff7ff;font-family:"Baloo 2","Fredoka","Trebuchet MS",system-ui,sans-serif;color:#26344a;touch-action:none;-webkit-user-select:none;user-select:none}
+body{display:grid;place-items:center}
+#shell{position:relative;width:min(100vw,56.25vh);height:min(100dvh,177.78vw);max-width:620px;max-height:1100px;overflow:hidden;background:#9be3ff;isolation:isolate;touch-action:none}
+canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.hud{position:absolute;z-index:2;inset:0;pointer-events:none;padding:clamp(14px,3vw,25px);display:flex;flex-direction:column}
+.top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.topleft{display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.brand{font-size:clamp(11px,2vw,14px);color:#365e7b;font-weight:800}.brand b{display:block;color:#243a56;font-size:clamp(20px,4vw,28px);margin-top:1px}
+.chip{display:none;gap:12px;align-items:center;padding:3px 14px;border-radius:14px;background:#ffffffb8;border:2px solid #fff;box-shadow:0 3px #305e7a1f;font-size:clamp(20px,5vw,26px);font-weight:800;line-height:1.3;font-variant-numeric:tabular-nums}
+.is-playing .chip{display:flex}
+.pill{border:2px solid #fff;background:#ffffffdb;border-radius:16px;padding:6px 12px;min-width:84px;text-align:right;box-shadow:0 3px #305e7a20}
+.pill small{display:block;font-size:12px;color:#54728a;font-weight:800}.pill strong{display:block;font-size:clamp(20px,4vw,26px);line-height:1.1;font-variant-numeric:tabular-nums}
+.bottom{margin-top:auto;display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.bl{display:flex;flex-direction:column;align-items:flex-start;gap:8px}
+.hint{font-size:14px;line-height:1.4;color:#315b77;text-shadow:0 1px #fff6;font-weight:700}.hint b{color:#243a56}
+.iconbtn{pointer-events:auto;border:2px solid #fff;background:#fff;color:#36536c;border-radius:14px;width:44px;height:44px;font-size:17px;cursor:pointer;box-shadow:0 3px #305e7a20;display:grid;place-items:center;text-decoration:none;font-weight:900;font-family:inherit}.iconbtn:active{transform:translateY(2px)}
+.is-playing .iconbtn{opacity:.85;width:40px;height:40px}.is-playing .pill{opacity:.8;transform:scale(.85);transform-origin:bottom right}
+.sbrand{display:inline-flex;align-items:center;gap:6px;padding:3px 11px 3px 4px;border-radius:999px;background:#ffffffc7;border:2px solid #fff;box-shadow:0 2px #305e7a22;color:#26344a;font-weight:800;font-size:12px;letter-spacing:.2px;pointer-events:none;white-space:nowrap}
+.sbrand i{font-style:normal;display:grid;place-items:center;width:20px;height:20px;border-radius:50%;background:linear-gradient(#ffd34d,#ff9a3c);color:#fff;font-weight:900;font-size:12px;text-shadow:0 1px #b8621c88}
+.overlay{position:absolute;z-index:5;inset:0;display:grid;place-items:center;padding:20px;background:#3675972e;overflow-y:auto}
+.card{width:min(100%,370px);padding:clamp(20px,5vw,30px);border-radius:28px;text-align:center;background:#fffdf4;border:3px solid #fff;box-shadow:0 7px #37688333,0 18px 45px #264d6529;animation:in .45s cubic-bezier(.3,1.4,.5,1)}
+@keyframes in{from{transform:translateY(24px) scale(.9);opacity:0}}
+.eyebrow{color:#e48b32;font-weight:800;font-size:13px}
+h1{font-size:clamp(38px,9vw,56px);line-height:.95;margin:10px 0;color:#263a54;text-shadow:0 3px #263a5414}
+.subtitle{font-size:15px;line-height:1.45;color:#60788b;margin:0 auto 16px;max-width:290px}
+.shipmark{margin:0 auto 12px;width:84px;height:84px;display:grid;place-items:center;border-radius:26px;background:#ffdc79;border:3px solid #fff;box-shadow:0 4px #efb64e;animation:float 2.2s ease-in-out infinite}.shipmark span{font-size:43px}@keyframes float{50%{transform:translateY(-7px) rotate(-4deg)}}
+.tips{display:flex;justify-content:center;gap:12px;margin:0 0 14px;font-size:14px;color:#60788b;font-weight:700;flex-wrap:wrap}
+.primary{width:100%;border:0;border-radius:15px;padding:13px 18px;background:#ffca45;color:#263a54;font-size:18px;font-weight:800;cursor:pointer;box-shadow:0 5px #e6a72b;font-family:inherit}.primary:active{transform:translateY(4px);box-shadow:0 1px #e6a72b}
+.secondary{margin-top:10px;width:100%;display:block;border:2px solid #dce8ec;border-radius:13px;padding:10px;background:#f4fafb;color:#426078;font-size:15px;font-weight:800;cursor:pointer;text-decoration:none;font-family:inherit}
+.controls{display:flex;gap:10px;justify-content:center;margin-top:14px;color:#678296;font-size:13px;font-weight:700;flex-wrap:wrap}
+.key{display:inline-grid;place-items:center;min-width:24px;height:22px;padding:0 6px;border:1px solid #d3e1e7;border-radius:7px;color:#426078;background:#f0f7fa;font-weight:800;margin-right:4px;font-style:normal}
+.cardbrand{margin-top:14px;font-size:13px;font-weight:700;color:#678296}.cardbrand b{color:#e48b32}
+.gameover-score{font-size:56px;font-weight:800;margin:0;line-height:1.1}.bestline{font-size:14px;color:#6d8797;font-weight:700;margin-bottom:12px}
+.is-playing .brand,.is-playing .hint,.is-playing #backHomeBtn{display:none!important}.hidden{display:none!important}
+#installHint{font-size:13px;color:#60788b;font-weight:700;margin-top:8px;line-height:1.4}
+:focus-visible{outline:3px solid #ff8b5c;outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+<!-- Google H5 Games Ads. Both scripts are required: the second one creates adBreak() and adConfig(). -->
+<!-- To test with fake ads, temporarily add data-adbreak-test="on" to the first script. Remove it before going live. -->
+<script async data-ad-client="ca-pub-2129877342025466" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2129877342025466" crossorigin="anonymous"></script>
+<script>
+window.adsbygoogle = window.adsbygoogle || [];
+var adBreak = adConfig = function(o) { adsbygoogle.push(o); };
+adConfig({ preloadAdBreaks: 'on', sound: 'on' });
+</script>
+</head>
+<body>
+<div id="shell" aria-label="Hold Up game">
+<canvas id="game" aria-label="Hold Up playfield"></canvas>
+<div class="hud">
+  <div class="top">
+    <div class="topleft">
+      <div class="brand">One-hold arcade<b>Hold Up</b></div>
+      <div class="chip" aria-label="Rows climbed">⬆ <span id="score">0</span></div>
+    </div>
+    <div style="display:flex;gap:7px;pointer-events:auto;align-items:center">
+      <a class="iconbtn" id="backHomeBtn" href="/" aria-label="Back to Scotcha home" title="Back to home" style="font-size:22px">⌂</a>
+      <button class="iconbtn" id="fsBtn" aria-label="Full screen" title="Full screen">⛶</button>
+      <button class="iconbtn" id="soundBtn" aria-label="Toggle sound" title="Toggle sound">♫</button>
+      <button class="iconbtn" id="pauseBtn" aria-label="Pause game" title="Pause">Ⅱ</button>
+    </div>
+  </div>
+  <div class="bottom">
+    <div class="bl">
+      <div class="hint"><b>Hold</b> to rise · <b>slide</b> to steer<br><span>Orange bars carry you sideways!</span></div>
+      <div class="sbrand" aria-hidden="true"><i>S</i>scotcha.in</div>
+    </div>
+    <div class="pill"><small>Best</small><strong id="best">0</strong></div>
+  </div>
+</div>
+<div class="overlay" id="startOverlay">
+  <div class="card">
+    <div class="shipmark"><span>🎈</span></div>
+    <div class="eyebrow">How high can you climb?</div>
+    <h1>Hold<br><span style="color:#ff8b5c">Up</span></h1>
+    <p class="subtitle">Hold to rise through the gaps. Rest on teal bars, but orange bars slide and carry you off screen.</p>
+    <div class="tips"><span>👆 Hold = rise</span><span>↔ Slide = steer</span></div>
+    <button class="primary" id="startBtn">Start climbing ↗</button>
+    <a class="secondary" href="/" aria-label="Back to Scotcha home">⌂ Back to home</a>
+    <button class="secondary hidden" id="installBtn">📲 Install · play full screen</button>
+    <div id="installHint" class="hidden"></div>
+    <div class="controls"><span><i class="key">Space</i>rise</span><span><i class="key">←</i><i class="key">→</i>steer</span></div>
+    <div class="cardbrand">A game by <b>Scotcha</b> · scotcha.in</div>
+  </div>
+</div>
+<div class="overlay hidden" id="overOverlay">
+  <div class="card">
+    <div class="eyebrow" id="resultEyebrow">Swept away</div>
+    <h1 style="font-size:38px">Game<br><span style="color:#ff8b5c">over</span></h1>
+    <div class="gameover-score" id="finalScore">0</div>
+    <div class="bestline" id="resultLine">rows climbed</div>
+    <button class="primary" id="restartBtn">Climb again ↻</button>
+    <button class="secondary" id="shareBtn">📤 Share my score</button>
+    <button class="secondary" id="homeBtn">Main menu</button>
+    <a class="secondary" href="/" aria-label="Back to Scotcha home">⌂ Back to home</a>
+    <div class="cardbrand">A game by <b>Scotcha</b> · scotcha.in</div>
+  </div>
+</div>
+<div class="overlay hidden" id="pauseOverlay">
+  <div class="card">
+    <div class="eyebrow">Taking a break</div><h1 style="font-size:42px">Paused</h1>
+    <button class="primary" id="resumeBtn">Resume ▶</button>
+    <button class="secondary" id="quitBtn">End run</button>
+  </div>
+</div>
+</div>
+<script>
+(() => {
+'use strict';
+const $=id=>document.getElementById(id),cv=$('game'),ctx=cv.getContext('2d'),shell=$('shell');
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),rand=(a,b)=>a+Math.random()*(b-a),ease=t=>t*t*(3-2*t);
+const rgb=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)),mix=(a,b,t)=>`rgb(${a.map((v,i)=>Math.round(v+(b[i]-v)*t)).join()})`;
+const SKY=[['#8fdcff','#dcf6ff'],['#ff9f7a','#ffe1a6'],['#141b4d','#3d4290']].map(p=>p.map(rgb)),NIGHT=[0,.3,1];
+const VW=360,R=11,TH=16,ROW=130,RISE=300,G=1500,MAXF=800,STEER=100,FLOOR={mv:0,v:0,floor:1};
+let H=640,sc=1,DPR=1,state='ready',last=0,T=0,time=0,cam=-40,score=0,skyP=0,best=0,rows=[],ball={x:VW/2,y:R,vy:0},standing=FLOOR;
+let ph=false,kh=false,ps=0,kl=0,kr=0,sx=0,soundOn=true,audioCtx=null,shake=0,parts=[],stars=[],clouds=[],night=0;
+try{best=Number(localStorage.getItem('holdUpBest')||0)||0}catch(e){}
+$('best').textContent=best;
+for(let i=0;i<60;i++)stars.push({x:Math.random()*VW,y:Math.random(),r:.6+Math.random()*1.3,p:Math.random()*6});
+for(let i=0;i<6;i++)clouds.push({x:Math.random()*VW,y:Math.random(),s:.5+Math.random()*.6,z:.15+Math.random()*.3,sp:5+Math.random()*8});
+// Interstitial ad at a natural break (play again). Google decides whether an ad really shows; the game always continues.
+let adBusy=false,adLast=0;
+function showAd(next){
+  if(adBusy)return;
+  if(typeof adBreak!=='function'||Date.now()-adLast<45000){next();return}
+  adBusy=true;let shown=false,done=false,saved;
+  const fin=function(){if(done)return;done=true;adBusy=false;next()};
+  try{
+    adBreak({type:'next',name:'play-again',
+      beforeAd:function(){shown=true;saved=soundOn;soundOn=false},
+      afterAd:function(){soundOn=saved;adLast=Date.now()},
+      adBreakDone:fin});
+    setTimeout(function(){if(!shown)fin()},3000);
+  }catch(e){fin()}
+}
+function resize(){const r=shell.getBoundingClientRect();DPR=Math.min(devicePixelRatio||1,2);cv.width=Math.round(r.width*DPR);cv.height=Math.round(r.height*DPR);sc=r.width/VW;H=r.height/sc;ctx.setTransform(DPR*sc,0,0,DPR*sc,0,0)}
+addEventListener('resize',resize);resize();
+function sound(f=440,d=.1,t='sine',v=.04){
+ if(!soundOn)return;
+ try{audioCtx||=new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume();
+ const o=audioCtx.createOscillator(),g=audioCtx.createGain(),n=audioCtx.currentTime;o.type=t;o.frequency.setValueAtTime(f,n);g.gain.setValueAtTime(v,n);g.gain.exponentialRampToValueAtTime(.001,n+d);o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(n+d)}catch(e){}
+}
+const note=i=>262*Math.pow(2,([0,2,4,7,9][i%5]+12*Math.floor(i/5))/12);
+function mk(i){
+ const d=Math.min(1,i/50),mv=i>0&&Math.random()<Math.min(.8,.3+i*.025),r={y:ROW*(i+1),mv};
+ if(mv){r.gw=125-40*d;r.v=(Math.random()<.5?-1:1)*(28+Math.random()*(30+50*d));r.P=VW+r.gw+40;r.g0=Math.random()*r.P}
+ else{r.gw=175-35*d;r.g0=VW/2+(Math.random()-.5)*40;r.v=0}
+ return r}
+const gc=r=>r.mv?(((r.g0+r.v*T)%r.P)+r.P)%r.P-r.gw/2-20:r.g0;
+const inGap=(r,x)=>!r.floor&&Math.abs(x-gc(r))<=r.gw/2-R;
+function reset(){rows=[];T=0;cam=-40;score=0;skyP=0;parts=[];ball={x:VW/2,y:R,vy:0};standing=FLOOR;ph=kh=false;ps=kl=kr=0;hud()}
+function start(){reset();state='playing';shell.classList.add('is-playing');['startOverlay','overOverlay','pauseOverlay'].forEach(i=>$(i).classList.add('hidden'))}
+function hud(){$('score').textContent=score;$('best').textContent=Math.max(best,score)}
+function lose(){
+ if(state!=='playing')return;state='over';shell.classList.remove('is-playing');shake=8;sound(130,.3,'sawtooth',.05);
+ for(let i=0;i<16;i++){const a=rand(0,6.28),v=rand(40,200);parts.push({x:ball.x,y:ball.y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:rand(.4,.9),max:.9,size:rand(2,5)})}
+ const nb=score>best;if(nb){best=score;try{localStorage.setItem('holdUpBest',String(best))}catch(e){}}
+ $('finalScore').textContent=score;$('resultEyebrow').textContent=nb?'New record!':'Swept away';
+ $('resultLine').textContent=(nb?'✦ New personal best · ':'Best: '+best+' · ')+'rows climbed';hud();
+ setTimeout(()=>{if(state==='over')$('overOverlay').classList.remove('hidden')},650);
+}
+function step(dt){
+ time+=dt;skyP+=(score-skyP)*Math.min(1,dt*2);shake=Math.max(0,shake-dt*20);
+ for(const p of parts){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy-=500*dt;p.life-=dt}parts=parts.filter(p=>p.life>0);
+ if(state==='playing'){
+ T+=dt;const b=ball,pb=b.y-R;
+ while(rows.length*ROW<cam+H+260)rows.push(mk(rows.length));
+ const hold=ph||kh,steer=clamp(ps+kr-kl,-1,1);
+ if(standing&&standing.mv)b.x+=standing.v*dt;
+ {const d=steer*STEER*dt;if((d<0&&b.x>R)||(d>0&&b.x<VW-R))b.x=clamp(b.x+d,R,VW-R)}
+ if(standing&&inGap(standing,b.x))standing=null;
+ if(hold){b.vy=RISE;standing=null}else if(!standing)b.vy=Math.max(b.vy-G*dt,-MAXF);else b.vy=0;
+ b.y+=b.vy*dt;
+ const i0=Math.floor((b.y-R)/ROW)-2;
+ for(let k=i0;k<=i0+4;k++){const r=rows[k];if(!r)continue;const top=r.y+TH;
+  if(b.y+R>r.y&&b.y-R<top&&!inGap(r,b.x)){
+   if(b.vy<=0&&pb>=top-.5){if(standing!==r&&pb>top+2)sound(180,.05,'triangle',.04);b.y=top+R;b.vy=0;standing=r}else return lose()}}
+ if(b.y-R<0){b.y=R;b.vy=0;standing=FLOOR}
+ if(b.x<-R||b.x>VW+R)return lose();
+ const s=Math.floor((b.y-R)/ROW);if(s>score){score=s;sound(note(s),.15,'triangle',.05);hud()}
+ }
+ cam+=(Math.max(-40,ball.y-H*.4)-cam)*Math.min(1,dt*6);
+}
+const sy=y=>H-(y-cam);
+function drawBg(){
+ const k=(skyP/18)%3,i=Math.floor(k),n=(i+1)%3,t=ease(k-i);night=NIGHT[i]+(NIGHT[n]-NIGHT[i])*t;
+ const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,mix(SKY[i][0],SKY[n][0],t));g.addColorStop(1,mix(SKY[i][1],SKY[n][1],t));ctx.fillStyle=g;ctx.fillRect(0,0,VW,H);
+ if(night>.05){for(const s of stars){ctx.globalAlpha=night*(.45+.55*Math.sin(time*2+s.p));ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(s.x,s.y*H,s.r,0,6.283);ctx.fill()}ctx.globalAlpha=1}
+ ctx.fillStyle=mix([248,253,255],[120,130,190],night);
+ for(const c of clouds){const x=((c.x-time*c.sp)%(VW+240)+VW+240)%(VW+240)-120,y=((c.y*H*.8+cam*c.z)%(H+100)+H+100)%(H+100)-50;
+  ctx.save();ctx.translate(x,y);ctx.scale(c.s,c.s);ctx.beginPath();ctx.arc(0,8,17,Math.PI,0);ctx.arc(17,-2,22,Math.PI,0);ctx.arc(39,8,16,Math.PI,0);ctx.lineTo(55,17);ctx.lineTo(-17,17);ctx.fill();ctx.restore()}
+ const gy=sy(0);
+ if(gy<H+40){ctx.fillStyle=mix(rgb('#75d66b'),[16,30,60],night*.6);ctx.beginPath();ctx.moveTo(0,H+10);
+  for(let x=0;x<=VW+10;x+=10)ctx.lineTo(x,gy-8+Math.sin(x/70)*10);ctx.lineTo(VW+10,H+10);ctx.closePath();ctx.fill();
+  ctx.fillStyle=mix(rgb('#53c85d'),[16,30,60],night*.6);ctx.fillRect(0,gy+4,VW,H)}
+}
+function seg(x,y,w,hue,mv){
+ if(w<=1)return;ctx.fillStyle=`hsl(${hue} 78% 62%)`;ctx.strokeStyle='#26344a';ctx.lineWidth=3;ctx.beginPath();ctx.roundRect(x,y,w,TH,6);ctx.fill();ctx.stroke();
+ ctx.fillStyle=`hsl(${hue} 90% 76%)`;ctx.beginPath();ctx.roundRect(x+4,y+3,Math.max(0,w-8),4,2);ctx.fill();
+}
+function draw(){
+ ctx.save();if(shake>0)ctx.translate(rand(-shake,shake),rand(-shake,shake));
+ drawBg();
+ const a=Math.max(0,Math.floor((cam-40)/ROW)),z=Math.ceil((cam+H)/ROW);
+ for(let i=a;i<=z&&i<rows.length;i++){const r=rows[i],c=gc(r),y=sy(r.y+TH),hue=r.mv?28:170;
+  seg(-8,y,c-r.gw/2+8,hue);seg(c+r.gw/2,y,VW+8-(c+r.gw/2),hue);
+  if(r.mv){ctx.fillStyle='rgba(38,52,74,.35)';const o=((time*r.v)%30+30)%30;
+   for(let x=-30+o;x<VW;x+=30)if(x<c-r.gw/2-14||x>c+r.gw/2+4){ctx.beginPath();const d=Math.sign(r.v);ctx.moveTo(x,y+4);ctx.lineTo(x+7*d,y+8);ctx.lineTo(x,y+12);ctx.lineTo(x+3*d,y+8);ctx.fill()}}}
+ if(state!=='over'||parts.length===0||true){
+  if(state!=='over'){const by=sy(ball.y);ctx.fillStyle='#ffd34d';ctx.strokeStyle='#26344a';ctx.lineWidth=3;ctx.beginPath();ctx.arc(ball.x,by,R,0,6.283);ctx.fill();ctx.stroke();
+   ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(ball.x-3.5,by-3.5,3,0,6.283);ctx.fill()}}
+ for(const p of parts){ctx.globalAlpha=Math.max(0,p.life/p.max);ctx.fillStyle='#ffd34d';ctx.beginPath();ctx.arc(p.x,sy(p.y),p.size,0,6.283);ctx.fill()}ctx.globalAlpha=1;
+ ctx.restore();
+}
+function frame(now){const dt=Math.min(.035,(now-last)/1000||0);last=now;if(state!=='paused')step(dt);draw();requestAnimationFrame(frame)}
+function pause(){if(state==='playing'){state='paused';ph=kh=false;ps=0;$('pauseOverlay').classList.remove('hidden');$('pauseBtn').textContent='▶'}else if(state==='paused'){state='playing';$('pauseOverlay').classList.add('hidden');$('pauseBtn').textContent='Ⅱ'}}
+function toMenu(){state='ready';shell.classList.remove('is-playing');['overOverlay','pauseOverlay'].forEach(i=>$(i).classList.add('hidden'));$('startOverlay').classList.remove('hidden');$('pauseBtn').textContent='Ⅱ';reset()}
+$('startBtn').onclick=start;$('restartBtn').onclick=()=>showAd(start);$('homeBtn').onclick=toMenu;$('resumeBtn').onclick=pause;
+$('pauseBtn').onclick=()=>{if(state==='playing'||state==='paused')pause()};
+$('quitBtn').onclick=()=>{$('pauseOverlay').classList.add('hidden');$('pauseBtn').textContent='Ⅱ';state='playing';lose()};
+$('soundBtn').onclick=()=>{soundOn=!soundOn;$('soundBtn').textContent=soundOn?'♫':'♪';$('soundBtn').style.opacity=soundOn?'1':'.55';if(soundOn)sound(600,.05)};
+$('shareBtn').onclick=async()=>{
+ const text=`I climbed ${score} rows in Hold Up! Can you beat me?`,url=location.origin+'/games/hold-up/';
+ try{if(navigator.share)await navigator.share({title:'Hold Up — Scotcha',text,url});else{await navigator.clipboard.writeText(text+' '+url);$('shareBtn').textContent='✓ Link copied'}}catch(e){}
+};
+shell.addEventListener('pointerdown',e=>{if(e.target.closest('button,.card,a'))return;if(state==='playing'){e.preventDefault();ph=true;sx=e.clientX;ps=0;try{shell.setPointerCapture(e.pointerId)}catch(x){}}},{passive:false});
+shell.addEventListener('pointermove',e=>{if(ph)ps=clamp((e.clientX-sx)/25,-1,1)});
+const up=()=>{ph=false;ps=0};addEventListener('pointerup',up);addEventListener('pointercancel',up);
+function key(e,v){const c=e.code;
+ if(c==='Space'||c==='ArrowUp'||c==='KeyW'){if(v&&!e.repeat){if(state==='ready')return start();if(state==='over')return showAd(start);if(state==='paused')return pause()}kh=v&&state==='playing'}
+ else if(c==='ArrowLeft'||c==='KeyA')kl=v?1:0;else if(c==='ArrowRight'||c==='KeyD')kr=v?1:0;
+ else if(v&&(c==='Escape'||c==='KeyP')){if(state==='playing'||state==='paused')pause();return}
+ else return;e.preventDefault()}
+addEventListener('keydown',e=>key(e,true));addEventListener('keyup',e=>key(e,false));
+addEventListener('blur',()=>{ph=kh=false;ps=kl=kr=0});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&state==='playing')pause()});
+reset();requestAnimationFrame(frame);
+// Offline + install support (shared Scotcha service worker)
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(()=>{}));
+// Full screen
+const de=document.documentElement,req=de.requestFullscreen||de.webkitRequestFullscreen,exit=document.exitFullscreen||document.webkitExitFullscreen,fs=$('fsBtn');
+const standalone=matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches||navigator.standalone===true;
+const isFS=()=>!!(document.fullscreenElement||document.webkitFullscreenElement);
+if(!req||standalone)fs.classList.add('hidden');
+fs.onclick=()=>{try{isFS()?exit.call(document):req.call(de)}catch(e){}};
+const syncFs=()=>{fs.textContent=isFS()?'⤡':'⛶'};document.addEventListener('fullscreenchange',syncFs);document.addEventListener('webkitfullscreenchange',syncFs);
+// Install button
+const ib=$('installBtn'),hint=$('installHint'),ios=/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);let deferred=null;
+if(!standalone){
+ if(ios)ib.classList.remove('hidden');
+ addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e;ib.classList.remove('hidden')});
+ addEventListener('appinstalled',()=>{ib.classList.add('hidden');hint.classList.add('hidden')});
+ ib.onclick=async()=>{if(deferred){deferred.prompt();try{await deferred.userChoice}catch(e){}deferred=null;ib.classList.add('hidden')}else{hint.textContent='On iPhone or iPad: tap Share, then “Add to Home Screen”. It opens full screen like an app.';hint.classList.remove('hidden')}};
+}
+})();
+</script>
+</body>
+</html>

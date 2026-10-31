@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-<url><loc>https://scotcha.in/</loc><lastmod>2026-10-30</lastmod></url>
-<url><loc>https://scotcha.in/games/</loc><lastmod>2026-10-30</lastmod></url>
-<url><loc>https://scotcha.in/about.html</loc><lastmod>2026-10-30</lastmod></url>
+<url><loc>https://scotcha.in/</loc><lastmod>2026-10-31</lastmod></url>
+<url><loc>https://scotcha.in/games/</loc><lastmod>2026-10-31</lastmod></url>
+<url><loc>https://scotcha.in/about.html</loc><lastmod>2026-10-31</lastmod></url>
 <url><loc>https://scotcha.in/contact.html</loc><lastmod>2026-10-30</lastmod></url>
-<url><loc>https://scotcha.in/privacy.html</loc><lastmod>2026-10-30</lastmod></url>
-<url><loc>https://scotcha.in/terms.html</loc><lastmod>2026-10-30</lastmod></url>
+<url><loc>https://scotcha.in/privacy.html</loc><lastmod>2026-10-31</lastmod></url>
+<url><loc>https://scotcha.in/terms.html</loc><lastmod>2026-10-31</lastmod></url>
 <url><loc>https://scotcha.in/games/rocket-dash/</loc><lastmod>2026-10-30</lastmod></url>
 <url><loc>https://scotcha.in/games/rocket-dash/guide.html</loc><lastmod>2026-10-30</lastmod></url>
 <url><loc>https://scotcha.in/games/stack-up/</loc><lastmod>2026-10-30</lastmod></url>
@@ -14,4 +14,6 @@
 <url><loc>https://scotcha.in/games/volleyball-duel/guide.html</loc><lastmod>2026-10-30</lastmod></url>
 <url><loc>https://scotcha.in/games/word-tower/</loc><lastmod>2026-10-30</lastmod></url>
 <url><loc>https://scotcha.in/games/word-tower/guide.html</loc><lastmod>2026-10-30</lastmod></url>
+<url><loc>https://scotcha.in/games/hold-up/</loc><lastmod>2026-10-31</lastmod></url>
+<url><loc>https://scotcha.in/games/hold-up/guide.html</loc><lastmod>2026-10-31</lastmod></url>
 </urlset>
