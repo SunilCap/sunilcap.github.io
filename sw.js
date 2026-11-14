@@ -1,6 +1,6 @@
 // Scotcha service worker: makes games installable and playable offline.
 // Bump VERSION whenever you want every player to refresh their cached copy.
-const VERSION = 'scotcha-v8';
+const VERSION = 'scotcha-v11';
 
 // Pages and files to save for offline play. Add the URL of every game here.
 // A URL that doesn't exist is skipped, so it's safe to list games before they're live.
@@ -33,6 +33,12 @@ const PRECACHE = [
   '/icons/stack-up-192.png',
   '/icons/stack-up-512.png',
   '/games/hold-up/manifest.webmanifest',
+  '/games/hold-up/hero.png',
+'/games/hold-up/cat.png',
+  '/games/hold-up/dog.png',
+  '/games/hold-up/pilot.png',
+  '/games/hold-up/santa-bloop.png',
+  '/games/hold-up/santa-dog.png',
   '/icons/hold-up-192.png',
   '/icons/hold-up-512.png',
   '/icons/icon-192.png',
