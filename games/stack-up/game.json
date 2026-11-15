@@ -1,0 +1,15 @@
+{
+  "title": "Stack Up",
+  "emoji": "🏗️",
+  "order": 20,
+  "tagline": "Drop, line up, and build high.",
+  "description": "A block slides across the screen. Tap to drop it on the tower, and any overhang is sliced off. Land blocks perfectly to build a combo.",
+  "bestFor": "timing, focus, and quick one-thumb sessions.",
+  "controls": "tap/click or press Space or Enter to drop.",
+  "glance": "tap, or press Space or Enter, to drop a block.",
+  "short": "Tap to drop sliding blocks and build the tallest tower. Land blocks perfectly to build a combo.",
+  "about": "A one-tap timing game. A block slides across the screen, and you drop it onto a growing tower. Overhanging parts are sliced off, and perfect drops build a combo. The sky changes from day to night as your tower climbs.",
+  "saves": "your best number of floors",
+  "share": true,
+  "sound": true
+}

@@ -1,0 +1,16 @@
+{
+  "title": "Hold Up",
+  "emoji": "🎈",
+  "order": 50,
+  "tagline": "Hold to rise, slide to steer.",
+  "description": "Climb through the gaps in an endless stack of bars. Teal bars are steady resting spots, but orange bars slide and can carry you off the screen. Collect stars along the way and spend them to continue a run.",
+  "bestFor": "timing, risk-taking, and quick one-thumb sessions.",
+  "controls": "press and hold to rise and slide sideways to steer, or use Space, Arrow Up, or W to rise and the arrow keys or A/D to steer.",
+  "glance": "press and hold to rise and slide to steer, or Space/Arrow Up/W to rise and the arrow keys or A/D to steer.",
+  "short": "Hold to rise, slide to steer, and climb through the gaps in an endless stack of bars. Rest on steady bars, but don't get carried off screen by the sliding ones.",
+  "about": "A one-finger climbing game. Hold to rise through the gaps in an endless stack of bars, and slide your finger to steer. Teal bars are steady places to rest, while orange bars slide and can carry you off the screen. Collect stars along the way and spend them to continue after a fall. The sky changes from day to night as you climb.",
+  "saves": "your best number of rows climbed, your bank of collected stars, which character you chose, which characters you have unlocked, and whether you have seen the first-time tip",
+  "stars": true,
+  "share": true,
+  "sound": true
+}

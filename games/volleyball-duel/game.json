@@ -1,0 +1,16 @@
+{
+  "title": "Volleyball Duel",
+  "emoji": "🏐",
+  "order": 30,
+  "tagline": "Jump into a fast volleyball rally.",
+  "description": "Play a friend on the same device or take on the computer, and learn the controls as you aim to keep the ball in play.",
+  "bestFor": "timing, positioning, and quick arcade matches.",
+  "controlsLabel": "Play on",
+  "controls": "desktop or mobile browser, with on-screen touch controls on phones.",
+  "glance": "keyboard on a computer, on-screen buttons on a phone.",
+  "guideHome": "Game guide",
+  "guideList": "Getting started",
+  "short": "A cartoon-style volleyball game for two players on one device, or one player against the computer.",
+  "about": "A cartoon-style volleyball game. Play a friend on the same device or take on the computer, with keyboard controls on a computer and on-screen buttons on a phone. First to ten points wins the match.",
+  "saves": null
+}

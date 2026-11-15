@@ -1,0 +1,15 @@
+{
+  "title": "Rocket Dash",
+  "emoji": "🚀",
+  "order": 10,
+  "tagline": "Fly, dodge, and collect stars.",
+  "description": "Guide a cheerful little rocket through wide gates, collect stars and power-ups, and try to beat your best distance.",
+  "bestFor": "quick reflexes, easy controls, and repeat runs.",
+  "controls": "tap/click or use Space, Arrow Up, or W to boost.",
+  "glance": "tap or press Space, Arrow Up, or W to thrust.",
+  "short": "Guide a rocket through gates, collect stars and power-ups, and beat your best distance.",
+  "about": "A one-tap arcade game. Tap to thrust a little rocket through a bright, scrolling sky, thread it between gates, collect stars and power-ups, and beat your best distance. Stars you collect can be spent to keep a run going.",
+  "saves": "your best distance and your bank of collected stars",
+  "stars": true,
+  "sound": true
+}
