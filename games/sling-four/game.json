@@ -1,0 +1,59 @@
+{
+  "title": "Sling Four",
+  "emoji": "🪙",
+  "order": 60,
+  "tagline": "Pull the string and sling your coins.",
+  "description": "A fast slingshot coin game for 2 to 4 players on one screen. Drag a coin to your string, pull it back and let go to fire it into another quarter. Clear your own quarter first to win.",
+  "bestFor": "quick matches with friends on one screen, or solo against bots.",
+  "controlsLabel": "Players",
+  "controls": "2 to 4 players on one screen, with any seat set to a bot (Easy, Normal or Hard). Drag a coin to your string, pull back, and release.",
+  "glance": "drag a coin to your string, pull back, and let go.",
+  "short": "A fast slingshot coin game for 2 to 4 players on one screen. Fire your coins into other quarters and clear your own first.",
+  "about": "A fast slingshot coin game for 2 to 4 players on one screen. Each player owns a corner and four coins. Drag a coin to your string, pull it back and let go to sling it into another quarter, and clear your own quarter first to win. Any seat can be played by a bot at Easy, Normal or Hard level.",
+  "saves": "how many rounds each colour has won",
+  "sound": true,
+  "share": true,
+  "guide": {
+    "goal": "Each player owns one quarter of the board and starts with 4 coins. Fire your coins into the other quarters, and be the first to empty your own.",
+    "controls": [
+      [
+        "Pick up a coin",
+        "Touch a coin in your quarter",
+        "Not used (touch or mouse)"
+      ],
+      [
+        "Load the string",
+        "Drag the coin to the string across your corner",
+        "Mouse: drag the same way"
+      ],
+      [
+        "Aim and power",
+        "Pull back further for a harder shot; pull to one side to aim",
+        "Mouse: drag further back"
+      ],
+      [
+        "Fire",
+        "Let go",
+        "Release the mouse button"
+      ],
+      [
+        "Pause",
+        "Pause button",
+        "P or Escape"
+      ]
+    ],
+    "tips": [
+      "Everyone plays at the same time, so there are no turns. Speed matters.",
+      "Drag a coin to a free spot in your own quarter first if you want to reposition it before firing.",
+      "A harder pull sends the coin further, so a gentle pull keeps a shot short.",
+      "On the start screen, tap a corner to switch a seat between Human and Bot. Easy bots are slow and wild, Hard bots aim for the player with the fewest coins.",
+      "The board is square and fits any screen, so you can play on a phone laid flat between two to four people."
+    ],
+    "faq": [
+      [
+        "How many can play?",
+        "Two to four players on one screen, and any seat can be a bot."
+      ]
+    ]
+  }
+}

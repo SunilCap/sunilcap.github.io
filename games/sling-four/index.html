@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Sling Four | Scotcha</title>
+<meta name="description" content="Sling Four by Scotcha: a fast 2 to 4 player slingshot coin game on one screen. Pull the string, fire your coins, and clear your quarter first.">
+<meta name="theme-color" content="#9be3ff">
+<meta property="og:title" content="Sling Four | Scotcha">
+<meta property="og:description" content="A fast 2 to 4 player slingshot coin game on one screen.">
+<meta property="og:type" content="website">
+<meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
+<link rel="manifest" href="/games/sling-four/manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="64x64" href="/icons/sling-four-favicon-64.png">
+<link rel="apple-touch-icon" href="/icons/sling-four-apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Sling Four">
+<style>
+:root{--bg:#9be3ff;--ink:#263a54;--panel:#fffdf4;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html,body{height:100%;margin:0;background:linear-gradient(#9be3ff,#dff7ff);color:var(--ink);font-family:"Baloo 2","Fredoka","Trebuchet MS",system-ui,sans-serif;touch-action:none;overscroll-behavior:none;user-select:none;-webkit-user-select:none}
+body{display:grid;place-items:center}
+#wrap{position:relative}
+canvas{display:block;touch-action:none;border:4px solid #fff;border-radius:22px;box-shadow:0 6px #3768833a,0 16px 40px #264d6533}
+#ov{position:absolute;inset:0;display:grid;place-items:center;background:#3675972e;text-align:center;border-radius:22px}
+#ov .box{background:var(--panel);color:var(--ink);padding:22px;border:3px solid #fff;border-radius:28px;box-shadow:0 7px #37688333,0 18px 45px #264d6529;width:min(88vw,350px);max-height:calc(100dvh - 24px);overflow-y:auto;box-sizing:border-box}
+h1{margin:0 0 8px;font-size:2.1rem;line-height:1;color:#263a54}p{margin:0 0 12px;font-size:.95rem;line-height:1.35;color:#60788b}
+label,.lb{display:block;font-size:.85rem;font-weight:700;margin:10px 0 6px}
+.seg{display:flex;gap:6px;justify-content:center}
+.seg button{flex:1;background:#fff;color:var(--ink);border:2px solid #d3e1e7;border-radius:14px;box-shadow:0 4px #d3e1e7;padding:8px 0;font-size:1.15rem}
+.seg button[aria-pressed="true"]{background:#ffca45;color:#263a54;border-color:#ffca45;box-shadow:0 4px #e6a72b}
+input[type=range]{width:100%;accent-color:#ff9a3c}
+button{font:inherit;font-weight:700;cursor:pointer}
+#go{margin-top:14px;padding:13px 18px;width:100%;background:#ffca45;color:#263a54;border:0;border-radius:15px;box-shadow:0 5px #e6a72b;font-size:1.2rem}
+#go:active{transform:translateY(3px);box-shadow:0 2px #e6a72b}
+#rs,#mn{padding:11px 20px;border:0;border-radius:14px;background:#ffca45;color:#263a54;box-shadow:0 4px #e6a72b;font-size:1rem}
+button[aria-label="Pause game"]{background:#fff;border:2px solid #fff;border-radius:14px;color:#36536c;box-shadow:0 3px #305e7a33}
+.sbrand{position:fixed;top:calc(env(safe-area-inset-top,0px) + 8px);left:8px;z-index:5;display:inline-flex;align-items:center;gap:6px;padding:3px 12px 3px 4px;border-radius:999px;background:#ffffffc7;border:2px solid #fff;box-shadow:0 2px #305e7a22;font-weight:800;font-size:13px;pointer-events:none;color:#263a54}
+.sbrand i{font-style:normal;display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:linear-gradient(#ffd34d,#ff9a3c);color:#fff;font-size:13px;text-shadow:0 1px #b8621c88}
+#how,.sbtn{background:#fff;color:#36536c;border:2px solid #d3e1e7;border-radius:14px;box-shadow:0 3px #d3e1e7;padding:8px 18px}#how{display:block;margin:10px auto 0}.sbtn{display:inline-block;margin:8px 3px 0;padding:6px 12px;font-size:.85rem}
+#ti svg{width:140px;height:140px;color:var(--ink)}
+html,body{-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+#wrap,#wrap *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+button{touch-action:manipulation}
+button:focus-visible,input:focus-visible{outline:3px solid #ff9a3c;outline-offset:2px}
+</style>
+<!-- Google H5 Games Ads. Both scripts are required: the second one creates adBreak() and adConfig(). -->
+<!-- To test with fake ads, temporarily add data-adbreak-test="on" to the first script. Remove it before going live. -->
+<script async data-ad-client="ca-pub-2129877342025466" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2129877342025466" crossorigin="anonymous"></script>
+<script>
+window.adsbygoogle = window.adsbygoogle || [];
+var adBreak = adConfig = function(o) { adsbygoogle.push(o); };
+adConfig({ preloadAdBreaks: 'on', sound: 'on' });
+</script>
+</head><body>
+<div id="wrap"><canvas id="c"></canvas>
+<div id="ov"><div class="box" id="main"><h1 id="h">Sling Four</h1>
+<p id="msg">Drag a coin to your string, pull the string back, then let go. Clear your own quarter first to win.</p>
+<div class="lb">Tap a corner to switch Human or Bot</div>
+<div id="seats" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div>
+<div id="dwrap"><div class="lb" style="margin-top:10px">Bot level</div><div class="seg" id="dseg"><button data-d="easy">Easy</button><button data-d="normal" aria-pressed="true">Normal</button><button data-d="hard">Hard</button></div></div>
+<button id="go">Start</button><button id="how">How to play</button></div>
+<div class="box" id="tut" style="display:none"><h1 id="th"></h1><div id="ti"></div><p id="tp"></p><div class="seg"><button id="tb">Back</button><button id="tn">Next</button></div></div></div></div>
+<script>
+const cv=document.getElementById('c'),ctx=cv.getContext('2d'),ov=document.getElementById('ov');
+const COL=['#ff6b9d','#4fc3ff','#ffca45','#53c85d'],NAME=['Pink','Blue','Yellow','Green'];
+const R=.034,T=.007,PULL=.09,K0=30,DECAY=1.4;
+const BASE=[[.5,0,.5,.42],[1,.5,.58,.5],[.5,1,.5,.58],[0,.5,.42,.5]];
+const CORN=[[0,0],[1,0],[1,1],[0,1]];
+const OFF=[[.27,.27],[.34,.27],[.27,.34],[.34,.34]];
+const SETS={2:[0,2],3:[0,1,2],4:[0,1,2,3]};
+let S=600,coins=[],drags={},snaps={},over=true,t0=0,N=1,act=[0,1,2,3],walls=BASE,power=150,isBot=[false,false,false,false],botS={},diff="normal";
+function size(){S=Math.floor(Math.min(innerWidth,innerHeight)-14);const d=Math.min(2,devicePixelRatio||1);cv.width=cv.height=S*d;cv.style.width=cv.style.height=S+'px';ctx.setTransform(d,0,0,d,0,0)}
+addEventListener('resize',size);size();
+const quad=(x,y)=>x<.5?(y<.5?0:3):(y<.5?1:2);
+function reset(){act=[0,1,2,3];isBot=hum.map(h=>!h);botS={};coins=[];drags={};snaps={};walls=BASE.slice();
+for(let p=0;p<4;p++){if(!act.includes(p)){const[cx,cy]=CORN[p];continue}
+for(const o of OFF){const[cx,cy]=CORN[p];coins.push({o:p,x:cx?1-o[0]:o[0],y:cy?1-o[1]:o[1],vx:0,vy:0,held:false})}}
+over=false;t0=performance.now();ov.style.display='none'}
+// Interstitial ad at a natural break (play again). Google decides whether an ad really shows; the game always continues.
+let adBusy=false,adLast=0;
+function showAd(next){
+  if(adBusy)return;
+  if(typeof adBreak!=='function'||Date.now()-adLast<45000){next();return}
+  adBusy=true;let shown=false,done=false,saved;
+  const fin=function(){if(done)return;done=true;adBusy=false;next()};
+  try{
+    adBreak({type:'next',name:'play-again',
+      beforeAd:function(){shown=true;saved=mute;mute=true},
+      afterAd:function(){mute=saved;adLast=Date.now()},
+      adBreakDone:fin});
+    setTimeout(function(){if(!shown)fin()},3000);
+  }catch(e){fin()}
+}
+document.getElementById('go').onclick=()=>{document.getElementById('go').textContent==='Play again'?showAd(reset):reset()};
+const pt=e=>{const r=cv.getBoundingClientRect();return[(e.clientX-r.left)/r.width,(e.clientY-r.top)/r.height]};
+cv.addEventListener('pointerdown',e=>{if(over)return;const[x,y]=pt(e);const q=quad(x,y);if(!act.includes(q)||isBot[q])return;let b=null,bd=R*3.4;
+for(const c of coins){if(c.held||quad(c.x,c.y)!==q)continue;const d=Math.hypot(c.x-x,c.y-y);if(d<bd){bd=d;b=c}}
+if(b){b.held=true;b.vx=b.vy=0;delete snaps[q];drags[e.pointerId]={c:b,sx:b.x,sy:b.y,q};cv.setPointerCapture(e.pointerId)}});
+cv.addEventListener('pointermove',e=>{const d=drags[e.pointerId];if(!d)return;let[x,y]=pt(e);const c=d.c;c.x=Math.max(R,Math.min(1-R,x));c.y=Math.max(R,Math.min(1-R,y));const dp=depth(d.q,c);if(dp>PULL){const[cx,cy]=CORN[d.q],M=mid(d.q),ux=cx-M[0],uy=cy-M[1],l=Math.hypot(ux,uy);c.x-=ux/l*(dp-PULL);c.y-=uy/l*(dp-PULL)}});
+function rel(e){const d=drags[e.pointerId];if(!d)return;const c=d.c,K=K0*power/100,M=mid(d.q);c.held=false;if(depth(d.q,c)<.01){const bad=quad(c.x,c.y)!==d.q||coins.some(o=>o!==c&&Math.hypot(o.x-c.x,o.y-c.y)<2*R);if(bad){c.x=d.sx;c.y=d.sy}c.vx=c.vy=0}else{c.vx=(M[0]-c.x)*K;c.vy=(M[1]-c.y)*K;c.by=d.q;c.vis=false;snaps[d.q]={x:c.x,y:c.y,t:performance.now()};beep(260+depth(d.q,c)*2500)}delete drags[e.pointerId]}
+cv.addEventListener('pointerup',rel);cv.addEventListener('pointercancel',rel);
+// iOS starts its press-and-hold highlight from touchstart, so cancel it on the board (pointer events are unaffected)
+cv.addEventListener('touchstart',e=>e.preventDefault(),{passive:false});
+function step(dt){
+if(coins.some(c=>c.gone))coins=coins.filter(c=>!c.gone);
+for(const c of coins){if(c.held)continue;c.px=c.x;c.py=c.y;c.x+=c.vx*dt;c.y+=c.vy*dt;const f=Math.exp(-DECAY*dt);c.vx*=f;c.vy*=f;
+if(!act.includes(quad(c.x,c.y)))c.vis=true;
+const emp=!act.includes(quad(c.x,c.y)),e=emp?.3+Math.random()*1.1:.8,j=emp?(Math.random()-.5)*.6:0;
+if(c.x<R){c.x=R;c.vy+=j*Math.abs(c.vx);c.vx=Math.abs(c.vx)*e}if(c.x>1-R){c.x=1-R;c.vy+=j*Math.abs(c.vx);c.vx=-Math.abs(c.vx)*e}
+if(c.y<R){c.y=R;c.vx+=j*Math.abs(c.vy);c.vy=Math.abs(c.vy)*e}if(c.y>1-R){c.y=1-R;c.vx+=j*Math.abs(c.vy);c.vy=-Math.abs(c.vy)*e}
+if(c.vis&&c.by!==undefined&&quad(c.x,c.y)===c.by&&quad(c.px,c.py)!==c.by){const[cx,cy]=CORN[c.by];if(cx?c.px<.5:c.px>=.5){c.x=c.px;c.vx=-c.vx*.8}if(cy?c.py<.5:c.py>=.5){c.y=c.py;c.vy=-c.vy*.8}}
+for(const[w0,w1,w2,w3]of walls){const ex=w2-w0,ey=w3-w1,L=ex*ex+ey*ey;let u=((c.x-w0)*ex+(c.y-w1)*ey)/L;u=Math.max(0,Math.min(1,u));
+const px=w0+ex*u,py=w1+ey*u;let dx=c.x-px,dy=c.y-py;const d=Math.hypot(dx,dy)||1e-6,m=R+T;
+if(d<m){dx/=d;dy/=d;c.x=px+dx*m;c.y=py+dy*m;const vn=c.vx*dx+c.vy*dy;if(vn<0){c.vx-=1.8*vn*dx;c.vy-=1.8*vn*dy}}}}
+for(let i=0;i<coins.length;i++)for(let j=i+1;j<coins.length;j++){const a=coins[i],b=coins[j];if(a.held||b.held)continue;
+let dx=b.x-a.x,dy=b.y-a.y;const d=Math.hypot(dx,dy),m=2*R;if(d>=m||d===0)continue;dx/=d;dy/=d;
+const ov2=(m-d)/2;a.x-=dx*ov2;a.y-=dy*ov2;b.x+=dx*ov2;b.y+=dy*ov2;
+const rv=(b.vx-a.vx)*dx+(b.vy-a.vy)*dy;if(rv<0){const j2=-(1+.95)*rv/2;a.vx-=j2*dx;a.vy-=j2*dy;b.vx+=j2*dx;b.vy+=j2*dy}}}
+function posts(p){const[cx,cy]=CORN[p];return[[cx?.86:.14,cy?.98:.02],[cx?.98:.02,cy?.86:.14]]}
+function mid(p){const[A,B]=posts(p);return[(A[0]+B[0])/2,(A[1]+B[1])/2]}
+function depth(p,c){const[cx,cy]=CORN[p],M=mid(p),ux=cx-M[0],uy=cy-M[1];return((c.x-M[0])*ux+(c.y-M[1])*uy)/Math.hypot(ux,uy)}
+function counts(){const n=[0,0,0,0];for(const c of coins)n[quad(c.x,c.y)]++;return n}
+function string(p,apex,w){const s=S,[A,B]=posts(p);ctx.strokeStyle='#e48b32';ctx.lineWidth=w*s;ctx.lineCap='round';ctx.lineJoin='round';ctx.beginPath();ctx.moveTo(A[0]*s,A[1]*s);if(apex)ctx.lineTo(apex[0]*s,apex[1]*s);ctx.lineTo(B[0]*s,B[1]*s);ctx.stroke()}
+function draw(now){const s=S;ctx.clearRect(0,0,s,s);
+ctx.fillStyle='#fff6d6';ctx.fillRect(0,0,s,s);
+for(let p=0;p<4;p++){const[cx,cy]=CORN[p];if(!act.includes(p)){ctx.fillStyle='#c9d3d9';ctx.fillRect(cx?.5*s:0,cy?.5*s:0,.5*s,.5*s)}
+else{ctx.globalAlpha=.16;ctx.fillStyle=COL[p];ctx.fillRect(cx?.5*s:0,cy?.5*s:0,.5*s,.5*s);ctx.globalAlpha=.4;ctx.beginPath();ctx.moveTo(cx*s,cy*s);ctx.arc(cx*s,cy*s,.14*s,0,7);ctx.fill();ctx.globalAlpha=1}}
+ctx.strokeStyle='#263a54';ctx.lineWidth=T*2*s;ctx.lineCap='round';
+for(const[a,b,c,d]of walls){ctx.beginPath();ctx.moveTo(a*s,b*s);ctx.lineTo(c*s,d*s);ctx.stroke()}
+const n=counts();
+for(const p of act){const[cx,cy]=CORN[p];const[A,B]=posts(p),M=[(A[0]+B[0])/2,(A[1]+B[1])/2];
+const dr=Object.values(drags).find(d=>d.q===p);
+if(dr){const c=dr.c,dp=depth(p,c);if(dp>0)string(p,[c.x,c.y],.007*(1-.65*Math.min(1,dp/PULL)));else string(p,null,.007)}
+else if(snaps[p]){const sn=snaps[p],t=(now-sn.t)/1000;if(t>.7){delete snaps[p];string(p,null,.007)}else{const a=Math.cos(t*34)*Math.exp(-t*7);string(p,[M[0]+(sn.x-M[0])*a,M[1]+(sn.y-M[1])*a],.007)}}
+else string(p,null,.007);
+ctx.fillStyle='#263a54';for(const P of[A,B]){ctx.beginPath();ctx.arc(P[0]*s,P[1]*s,.014*s,0,7);ctx.fill()}
+ctx.fillStyle=COL[p];ctx.globalAlpha=.9;ctx.font='bold '+(.07*s)+'px "Trebuchet MS",sans-serif';ctx.textAlign=cx?'right':'left';ctx.textBaseline=cy?'bottom':'top';
+ctx.fillText(n[p],(cx?.975:.025)*s,(cy?.99:.01)*s);ctx.globalAlpha=1}
+for(const k in drags){const d=drags[k],c=d.c,M=mid(d.q),vx=M[0]-c.x,vy=M[1]-c.y;if(depth(d.q,c)<.01)continue;ctx.fillStyle='#263a54';for(let i=1;i<=5;i++){ctx.beginPath();ctx.arc((c.x+vx*i*.9)*s,(c.y+vy*i*.9)*s,.004*s,0,7);ctx.fill()}}
+for(const c of coins){ctx.fillStyle=COL[c.o];ctx.strokeStyle='#263a54';ctx.lineWidth=.005*s;ctx.beginPath();ctx.arc(c.x*s,c.y*s,R*s,0,7);ctx.fill();ctx.stroke();
+ctx.strokeStyle='rgba(255,255,255,.55)';ctx.lineWidth=.003*s;ctx.beginPath();ctx.arc(c.x*s,c.y*s,R*.6*s,0,7);ctx.stroke()}}
+const SV='<svg viewBox="0 0 120 120" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">',BD='<rect x="6" y="6" width="108" height="108"/><path d="M60 6V50M114 60H70M60 114V70M6 60H50"/>',CN=(x,y,c)=>'<circle cx="'+x+'" cy="'+y+'" r="6" fill="'+c+'" stroke-width="2"/>';
+const STEPS=[
+['The goal','Each player owns one quarter of the board and starts with 4 coins. Be the first to empty your own quarter.',SV+BD+CN(26,26,'#ff6b9d')+CN(25,42,'#ff6b9d')+CN(42,25,'#ff6b9d')+CN(40,40,'#ff6b9d')+CN(94,26,'#4fc3ff')+CN(94,94,'#ffca45')+CN(26,94,'#53c85d')+'</svg>'],
+['1. Bring a coin to the string','Touch a coin in your quarter and drag it to the black string across your corner. You can also drop it in a free spot in your quarter to reposition it first.',SV+'<rect x="6" y="6" width="108" height="108"/><path d="M40 6L6 40" stroke-width="5"/>'+CN(70,70,'#ff6b9d')+'<path d="M62 62L40 40" stroke-dasharray="2 8"/></svg>'],
+['2. Pull the string back','Keep pulling toward the corner. The string bends and gets tighter. The further back, the harder the shot. Pull to one side to aim.',SV+'<rect x="6" y="6" width="108" height="108"/><path d="M40 6L20 20L6 40" stroke-width="4"/>'+CN(20,20,'#ff6b9d')+'<path d="M32 32L88 88" stroke-dasharray="2 8"/></svg>'],
+['3. Let go and fire','Release to sling the coin through the open middle into another quarter. Coins that land in your quarter are yours to fire back. Everyone plays at the same time, with no turns.',SV+BD+CN(26,26,'#ff6b9d')+CN(94,94,'#ffca45')+'<path d="M38 38L86 86" stroke-dasharray="2 8"/></svg>']];
+let ti=0;
+function tut(i){ti=i;const s=STEPS[i];document.getElementById('th').textContent=s[0];document.getElementById('ti').innerHTML=s[2];document.getElementById('tp').textContent=s[1];document.getElementById('tb').style.visibility=i?'visible':'hidden';document.getElementById('tn').textContent=i==STEPS.length-1?'Got it':'Next';document.getElementById('main').style.display='none';document.getElementById('tut').style.display='block'}
+document.getElementById('how').onclick=()=>tut(0);
+document.getElementById('tb').onclick=()=>tut(ti-1);
+document.getElementById('tn').onclick=()=>{if(ti<STEPS.length-1)tut(ti+1);else{document.getElementById('tut').style.display='none';document.getElementById('main').style.display='block'}};
+let mute=false,AC;function beep(f,d=.14){if(mute)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();const t=AC.currentTime,o=AC.createOscillator(),g=AC.createGain();o.type='triangle';o.frequency.setValueAtTime(f,t);o.frequency.exponentialRampToValueAtTime(f*.4,t+d);g.gain.setValueAtTime(.15,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g);g.connect(AC.destination);o.start();o.stop(t+d)}catch(e){}}
+(function(){const m=document.getElementById('main'),mk=(tx,css)=>{const e=document.createElement('span');e.textContent=tx;e.style.cssText=css;return e};
+m.insertBefore(mk('SCOTCHA','display:inline-block;padding:3px 14px;border-radius:999px;background:#fff;border:2px solid #fff;box-shadow:0 2px #305e7a22;font-size:.75rem;letter-spacing:.25em;font-weight:800;color:#e48b32;margin-bottom:10px'),m.firstChild);
+const s=document.createElement('button');s.className='sbtn';s.textContent='Sound: on';s.onclick=()=>{mute=!mute;s.textContent='Sound: '+(mute?'off':'on')};m.appendChild(s);
+{const a=document.createElement('a');a.href='https://scotcha.in';a.target='_blank';a.rel='noopener';a.textContent='© Scotcha · scotcha.in → more games';a.style.cssText='display:block;margin-top:12px;font-size:.75rem;color:#e48b32;font-weight:800;text-decoration:none';m.appendChild(a)}})();
+(function(){const m=document.getElementById('main'),btn=(t,fn)=>{const b=document.createElement('button');b.className='sbtn';b.textContent=t;b.onclick=fn;m.insertBefore(b,m.lastChild);return b};
+if(document.documentElement.requestFullscreen)btn('Fullscreen',()=>{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen().catch(()=>{})});
+let dip;addEventListener('beforeinstallprompt',e=>{e.preventDefault();dip=e;const b=btn('Install app',()=>{dip.prompt();b.remove()})});})();
+addEventListener('orientationchange',()=>setTimeout(size,200));document.addEventListener('fullscreenchange',()=>setTimeout(size,100));
+if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('/sw.js').catch(()=>{});
+const SCORE_KEY='scotchaSlingWins';let wins;try{wins=JSON.parse(localStorage.getItem(SCORE_KEY))||[0,0,0,0]}catch(e){wins=[0,0,0,0]}
+(function(){const m=document.getElementById('main'),h1=document.getElementById('h'),ls=document.getElementById('wrap');
+const span=(css,tx)=>{const e=document.createElement('span');e.style.cssText=css;if(tx)e.textContent=tx;m.insertBefore(e,m.lastChild);return e};
+const wl=span('display:block;margin-top:10px;font-size:.8rem;opacity:.8');const paint=()=>{wl.textContent='Wins: '+NAME.map((n,i)=>n+' '+wins[i]).join(' · ')};paint();
+new MutationObserver(()=>{const t=h1.textContent;if(/win/.test(t)){NAME.forEach((n,i)=>{if(t.indexOf(n)>-1)wins[i]++});try{localStorage.setItem(SCORE_KEY,JSON.stringify(wins))}catch(e){}paint()}}).observe(h1,{childList:true,characterData:true,subtree:true});
+const sb=document.createElement('button');sb.className='sbtn';sb.textContent='Share';m.insertBefore(sb,m.lastChild);
+sb.onclick=async()=>{const d={title:'Sling Four | Scotcha',text:'Play Sling Four with up to 4 players on one screen.',url:location.href};try{if(navigator.share)await navigator.share(d);else{await navigator.clipboard.writeText(d.url);sb.textContent='Link copied';setTimeout(()=>sb.textContent='Share',1500)}}catch(e){}};
+if(/iPad|iPhone|iPod/.test(navigator.userAgent)&&!navigator.standalone)span('display:block;margin-top:10px;font-size:.75rem;opacity:.75;line-height:1.3','On iPhone: tap Share, then Add to Home Screen to play fullscreen.');
+const pz=document.createElement('div');pz.style.cssText='position:absolute;inset:0;display:none;place-items:center;background:rgba(0,0,0,.55);text-align:center';
+pz.innerHTML='<div style="background:var(--panel);color:var(--ink);padding:20px 26px;border:3px solid var(--ink)"><h1 style="margin:0 0 12px;font-size:1.5rem">Paused</h1><div style="display:flex;gap:8px"><button id="rs">Resume</button><button id="mn">Menu</button></div></div>';ls.appendChild(pz);
+let paused=false;
+function pause(){if(over)return;for(const k in drags){const d=drags[k];d.c.x=d.sx;d.c.y=d.sy;d.c.held=false;d.c.vx=d.c.vy=0;delete drags[k]}over=true;paused=true;pz.style.display='grid'}
+function resume(){pz.style.display='none';paused=false;over=false}
+pz.querySelector('#rs').onclick=resume;pz.querySelector('#mn').onclick=()=>{pz.style.display='none';paused=false;ov.style.display='grid'};
+const pb=document.createElement('button');pb.textContent='Pause';pb.setAttribute('aria-label','Pause game');pb.style.cssText='position:fixed;top:calc(env(safe-area-inset-top,0px) + 8px);right:8px;z-index:5;padding:8px 12px;opacity:.85;display:none';pb.onclick=pause;document.body.appendChild(pb);
+setInterval(()=>{pb.style.display=over?'none':'block'},250);
+addEventListener('keydown',e=>{if(e.key==='p'||e.key==='Escape')paused?resume():pause()});
+document.addEventListener('visibilitychange',()=>{if(document.hidden)pause()});
+document.addEventListener('contextmenu',e=>e.preventDefault());document.addEventListener('gesturestart',e=>e.preventDefault());
+})();
+{const b=document.createElement('span');b.className='sbrand';b.innerHTML='<i>S</i>scotcha.in';document.body.appendChild(b)}
+
+const BOTS={easy:{gap:[3200,5200],noise:.2,pw:[.5,.85]},normal:{gap:[1800,3200],noise:.09,pw:[.65,1]},hard:{gap:[900,1700],noise:.035,pw:[.8,1]}};
+const rnd=(a,b)=>a+Math.random()*(b-a);
+document.getElementById('dseg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;diff=b.dataset.d;[...b.parentNode.children].forEach(x=>x.setAttribute('aria-pressed',x===b))});
+const hum=[false,false,false,true],dw=document.getElementById('dwrap'),seats=document.getElementById('seats');
+function paintSeats(){seats.innerHTML='';[0,1,3,2].forEach(p=>{const b=document.createElement('button');b.textContent=NAME[p]+' \u00b7 '+(hum[p]?'Human':'Bot');b.style.cssText='padding:10px 6px;border-radius:14px;border:3px solid '+COL[p]+';background:'+(hum[p]?COL[p]:'#fff')+';color:#263a54;font-size:1rem;box-shadow:0 4px '+(hum[p]?'#0002':'#d3e1e7');b.onclick=()=>{hum[p]=!hum[p];paintSeats()};seats.appendChild(b)});dw.style.display=hum.every(Boolean)?'none':'block'}
+function simQ(x,y,vx,vy){for(let i=0;i<420;i++){const dt=1/60;x+=vx*dt;y+=vy*dt;const f=Math.exp(-DECAY*dt);vx*=f;vy*=f;
+if(x<R){x=R;vx=Math.abs(vx)*.8}if(x>1-R){x=1-R;vx=-Math.abs(vx)*.8}if(y<R){y=R;vy=Math.abs(vy)*.8}if(y>1-R){y=1-R;vy=-Math.abs(vy)*.8}
+for(const[a,b,c,d]of BASE){const ex=c-a,ey=d-b;let u=((x-a)*ex+(y-b)*ey)/(ex*ex+ey*ey);u=Math.max(0,Math.min(1,u));let dx=x-(a+ex*u),dy=y-(b+ey*u);const l=Math.hypot(dx,dy)||1e-6,m=R+T;if(l<m){dx/=l;dy/=l;x=a+ex*u+dx*m;y=b+ey*u+dy*m;const vn=vx*dx+vy*dy;if(vn<0){vx-=1.8*vn*dx;vy-=1.8*vn*dy}}}
+if(Math.hypot(vx,vy)<.08)break}return quad(x,y)}
+const CAND={};function botAim(q,P){const[cx,cy]=CORN[q],M=mid(q),ux=cx-M[0],uy=cy-M[1],ul=Math.hypot(ux,uy),k=K0*power/100,th0=Math.atan2(.5-M[1],.5-M[0]),cand=CAND[q]||(CAND[q]=[]);
+if(!cand.length)for(let pf=.3;pf<=1.001;pf+=.05){const L=PULL*pf;for(let i=-16;i<=16;i++){const th=th0+i*Math.PI/45,dx=Math.cos(th),dy=Math.sin(th);if(-(dx*ux+dy*uy)/ul<.35)continue;cand.push({th,L,q2:simQ(M[0]-dx*L,M[1]-dy*L,dx*L*k,dy*L*k)})}}
+const n=counts(),opp=[0,1,2,3].filter(i=>i!==q);let pool=cand;
+if(diff==='hard'){const tgt=opp.reduce((a,b)=>n[b]<n[a]?b:a),t=cand.filter(c=>c.q2===tgt);pool=t.length?t:cand.filter(c=>c.q2!==q)}
+else if(diff==='normal'||Math.random()<.5)pool=cand.filter(c=>c.q2!==q);
+if(!pool.length)pool=cand;
+const pk=pool[Math.floor(Math.random()*pool.length)],L=pk.L,th=pk.th+(Math.random()-.5)*2*P.noise,dx=Math.cos(th),dy=Math.sin(th);
+return{sx:M[0]-dx*L,sy:M[1]-dy*L,vx:dx*L*k,vy:dy*L*k}}
+setInterval(()=>{if(over)return;const now=performance.now(),P=BOTS[diff];
+for(let q=0;q<4;q++){if(!isBot[q])continue;let b=botS[q];if(!b)b=botS[q]={ph:0,t:now+rnd(600,1500)};
+if(b.ph===1){if(!b.c.held){b.ph=0;b.t=now+800;delete drags['b'+q];continue}
+const u=Math.min(1,(now-b.s)/b.dur),e=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2;b.c.x=b.fx+(b.tx-b.fx)*e;b.c.y=b.fy+(b.ty-b.fy)*e;
+if(u>=1){const c=b.c;c.held=false;c.vx=b.vx;c.vy=b.vy;c.by=q;c.vis=false;delete drags['b'+q];snaps[q]={x:c.x,y:c.y,t:now};beep(300+Math.hypot(b.vx,b.vy)*80);b.ph=0;b.t=now+rnd(P.gap[0],P.gap[1])}continue}
+if(now<b.t)continue;
+const mine=coins.filter(c=>!c.held&&quad(c.x,c.y)===q&&Math.hypot(c.vx,c.vy)<.2);if(!mine.length){b.t=now+700;continue}
+const c=mine[Math.floor(Math.random()*mine.length)],a=botAim(q,P);
+drags['b'+q]={c,sx:c.x,sy:c.y,q};c.held=true;c.vx=c.vy=0;delete snaps[q];Object.assign(b,{ph:1,c,fx:c.x,fy:c.y,tx:a.sx,ty:a.sy,vx:a.vx,vy:a.vy,s:now,dur:rnd(350,650)})}},40);
+const _draw=draw;draw=function(now){_draw(now);for(let p=0;p<4;p++){if(!isBot[p])continue;const[cx,cy]=CORN[p],s=S;ctx.save();ctx.font='800 '+(.03*s)+'px "Baloo 2",sans-serif';ctx.textAlign=cx?'right':'left';ctx.textBaseline='middle';ctx.fillStyle='#263a54';ctx.globalAlpha=.7;ctx.fillText('BOT',(cx?.975:.025)*s,(cy?.115:.885)*s);ctx.restore()}};
+paintSeats();
+const emptyAt=[0,0,0,0];
+setInterval(()=>{if(over)return;const now=performance.now(),n=counts(),w=[];
+for(let p=0;p<4;p++){if(n[p]===0){if(!emptyAt[p])emptyAt[p]=now;else if(now-emptyAt[p]>400)w.push(p)}else emptyAt[p]=0}
+if(w.length){over=true;for(const k in drags){drags[k].c.held=false;delete drags[k]}document.getElementById('h').textContent=w.map(i=>NAME[i]).join(' & ')+(w.length>1?' win':' wins')+'!';document.getElementById('msg').textContent='Cleared their quarter first. Change seats, then go again.';document.getElementById('go').textContent='Play again';ov.style.display='grid';emptyAt.fill(0)}},100);
+setTimeout(()=>{for(let q=0;q<4;q++)try{botAim(q,BOTS.easy)}catch(e){}},400);
+let last=performance.now();
+function loop(now){const dt=Math.min(.033,(now-last)/1000);last=now;
+if(!over){for(let i=0;i<4;i++)step(dt/4);
+if(now-t0>800&&!Object.keys(drags).length&&coins.every(c=>Math.hypot(c.vx,c.vy)<.25)){const n=counts(),w=act.filter(i=>n[i]===0);
+if(w.length){over=true;document.getElementById('h').textContent=w.map(i=>NAME[i]).join(' & ')+(w.length>1?' win':' wins')+'!';
+document.getElementById('msg').textContent='Cleared their quarter first. Change seats, then go again.';document.getElementById('go').textContent='Play again';ov.style.display='grid'}}}
+draw(now);requestAnimationFrame(loop)}
+requestAnimationFrame(loop);
+</script></body></html>

@@ -1,0 +1,26 @@
+{
+  "name": "Sling Four – Scotcha",
+  "short_name": "Sling Four",
+  "description": "A fast slingshot coin game for 2 to 4 players on one screen. Drag a coin to your string, pull it back and let go to fire it into another quarter. Clear your own quarter first to win.",
+  "id": "/games/sling-four/",
+  "start_url": "/games/sling-four/",
+  "scope": "/games/sling-four/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fff3cc",
+  "theme_color": "#fff3cc",
+  "icons": [
+    {
+      "src": "/icons/sling-four-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/sling-four-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
