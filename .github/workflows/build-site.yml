@@ -1,1 +1,35 @@
-
+name: Build site
+# Runs whenever you push games, pages or the build script. Regenerates the home page tiles, games list,
+# about page, privacy list, terms, sitemap.xml and the offline cache list from each game's game.json.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'games/**'
+      - 'scripts/**'
+      - 'icons/**'
+      - 'index.html'
+      - 'about.html'
+      - 'privacy.html'
+      - 'terms.html'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Run the site builder
+        run: python3 scripts/build.py
+      - name: Commit generated files
+        run: |
+          git config user.name "scotcha-build"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet || (git commit -m "Auto-update site from game files [skip ci]" && git push)
